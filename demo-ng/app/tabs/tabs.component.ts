@@ -1,6 +1,5 @@
 import { Component } from "@angular/core";
-import { isAndroid } from "tns-core-modules/platform";
-import { SelectedIndexChangedEventData, TabView } from "tns-core-modules/ui/tab-view";
+import { isAndroid, SelectedIndexChangedEventData, TabView } from '@nativescript/core';
 
 @Component({
   selector: "TabsComponent",

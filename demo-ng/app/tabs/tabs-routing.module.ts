@@ -1,6 +1,6 @@
 import { NgModule } from "@angular/core";
 import { Routes } from "@angular/router";
-import { NativeScriptRouterModule } from "nativescript-angular/router";
+import { NativeScriptRouterModule } from "@nativescript/angular";
 
 import { TabsComponent } from "./tabs.component";
 import { TextRecognitionComponent } from "~/tabs/mlkit/textrecognition/textrecognition.component";

@@ -1,5 +1,5 @@
 import { NgModule, NO_ERRORS_SCHEMA } from "@angular/core";
-import { NativeScriptCommonModule } from "nativescript-angular/common";
+import { NativeScriptCommonModule, registerElement } from "@nativescript/angular";
 
 import { FirestoreComponent } from "./firestore/firestore.component";
 import { MLKitComponent } from "./mlkit/mlkit.component";
@@ -15,7 +15,6 @@ import { CustomModelComponent } from "~/tabs/mlkit/custommodel/custommodel.compo
 import { AutoMLComponent } from "~/tabs/mlkit/automl/automl.component";
 import { LanguageIdentificationComponent } from "~/tabs/mlkit/languageidentification/languageidentification.component";
 
-import { registerElement } from "nativescript-angular/element-registry";
 registerElement("MLKitBarcodeScanner", () => require("nativescript-plugin-firebase/mlkit/barcodescanning").MLKitBarcodeScanner);
 registerElement("MLKitFaceDetection", () => require("nativescript-plugin-firebase/mlkit/facedetection").MLKitFaceDetection);
 registerElement("MLKitObjectDetection", () => require("nativescript-plugin-firebase/mlkit/objectdetection").MLKitObjectDetection);

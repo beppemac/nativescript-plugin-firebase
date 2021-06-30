@@ -1,5 +1,5 @@
 import { Component, NgZone } from "@angular/core";
-import { RouterExtensions } from "nativescript-angular";
+import { RouterExtensions } from "@nativescript/angular";
 import * as Camera from "nativescript-camera";
 import * as ImagePicker from "nativescript-imagepicker";
 import { BarcodeFormat, MLKitScanBarcodesOnDeviceResult } from "nativescript-plugin-firebase/mlkit/barcodescanning";
@@ -12,11 +12,11 @@ import { MLKitAutoMLResult } from "nativescript-plugin-firebase/mlkit/automl";
 import { MLKitObjectDetectionResult } from "nativescript-plugin-firebase/mlkit/objectdetection";
 import { MLKitSmartReplyConversationMessage } from "nativescript-plugin-firebase/mlkit/smartreply";
 import { MLKitRecognizeTextResult } from "nativescript-plugin-firebase/mlkit/textrecognition";
-import * as fileSystemModule from "tns-core-modules/file-system";
-import { ImageAsset } from "tns-core-modules/image-asset";
-import { fromFile, ImageSource } from "tns-core-modules/image-source";
-import { isIOS } from "tns-core-modules/platform";
-import { action } from "tns-core-modules/ui/dialogs";
+import * as fileSystemModule from '@nativescript/core/file-system';
+import { ImageAsset } from '@nativescript/core';
+import { ImageSource, fromFile } from '@nativescript/core';
+import { isIOS } from '@nativescript/core';
+import { Dialogs } from '@nativescript/core';
 
 const firebase = require("nativescript-plugin-firebase");
 
@@ -61,7 +61,7 @@ export class MLKitComponent {
   }
 
   fromCameraFeed(): void {
-    action(
+    Dialogs.action(
         "Test which on-device ML Kit feature?",
         "Cancel",
         this.mlkitOnDeviceFeatures
@@ -180,7 +180,7 @@ export class MLKitComponent {
   }
 
   private selectMLKitFeature(imageSource: ImageSource): void {
-    action(
+    Dialogs.action(
         "Use which ML Kit feature?",
         "Cancel",
         this.mlkitFeatures

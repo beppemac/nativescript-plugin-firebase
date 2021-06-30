@@ -1,4 +1,4 @@
-import { PropertyChangeData } from "tns-core-modules/data/observable";
+import { PropertyChangeData } from '@nativescript/core';
 
 export abstract class AbstractMLKitViewComponent {
   torchOn: boolean = false;

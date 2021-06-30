@@ -45,6 +45,8 @@ demo-ng/*.d.ts
 demo/lib
 demo-push/lib
 demo-ng/lib
+demo-ng/metadata-x86_64
+demo-ng/typings
 demo/platforms
 demo-push/platforms
 demo-ng/platforms
