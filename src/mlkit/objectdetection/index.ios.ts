@@ -10,7 +10,7 @@ export class MLKitObjectDetection extends MLKitObjectDetectionBase {
   }
 
   protected createSuccessListener(): any {
-    return (objects: NSArray<FIRVisionObject>, error: NSError) => {
+    return (objects: NSArray<MLKObject>, error: NSError) => {
       if (error !== null) {
         console.log(error.localizedDescription);
 
@@ -20,7 +20,7 @@ export class MLKitObjectDetection extends MLKitObjectDetectionBase {
         };
 
         for (let i = 0, l = objects.count; i < l; i++) {
-          const obj: FIRVisionObject = objects.objectAtIndex(i);
+          const obj: MLKObject = objects.objectAtIndex(i);
           result.objects.push(getMLKitObjectDetectionResultItem(obj, this.lastVisionImage));
         }
 
@@ -38,20 +38,19 @@ export class MLKitObjectDetection extends MLKitObjectDetectionBase {
   }
 }
 
-function getDetector(stream: boolean, classify: boolean, multiple: boolean): FIRVisionObjectDetector {
-  const firVision: FIRVision = FIRVision.vision();
-  const fIRVisionObjectDetectorOptions = FIRVisionObjectDetectorOptions.new();
-  fIRVisionObjectDetectorOptions.detectorMode = stream ? FIRVisionObjectDetectorMode.Stream : FIRVisionObjectDetectorMode.SingleImage;
-  fIRVisionObjectDetectorOptions.shouldEnableClassification = classify || false;
-  fIRVisionObjectDetectorOptions.shouldEnableMultipleObjects = multiple || false;
-  return firVision.objectDetectorWithOptions(fIRVisionObjectDetectorOptions);
+function getDetector(stream: boolean, classify: boolean, multiple: boolean): MLKObjectDetector {
+  const mlkObjectDetectorOptions = MLKObjectDetectorOptions.new();
+  mlkObjectDetectorOptions.detectorMode = stream ? MLKObjectDetectorModeStream : MLKObjectDetectorModeSingleImage;
+  mlkObjectDetectorOptions.shouldEnableClassification = classify || false;
+  mlkObjectDetectorOptions.shouldEnableMultipleObjects = multiple || false;
+  return MLKObjectDetector.objectDetectorWithOptions(mlkObjectDetectorOptions);
 }
 
 export function detectObjects(options: MLKitObjectDetectionOptions): Promise<MLKitObjectDetectionResult> {
   return new Promise((resolve, reject) => {
     try {
       const detector = getDetector(false, options.classify, options.multiple);
-      detector.processImageCompletion(getImage(options), (objects: NSArray<FIRVisionObject>, error: NSError) => {
+      detector.processImageCompletion(getImage(options), (objects: NSArray<MLKObject>, error: NSError) => {
         if (error !== null) {
           reject(error.localizedDescription);
 
@@ -62,7 +61,7 @@ export function detectObjects(options: MLKitObjectDetectionOptions): Promise<MLK
 
           const image: UIImage = options.image instanceof ImageSource ? options.image.ios : options.image.imageSource.ios;
           for (let i = 0, l = objects.count; i < l; i++) {
-            const obj: FIRVisionObject = objects.objectAtIndex(i);
+            const obj: MLKObject = objects.objectAtIndex(i);
             result.objects.push(getMLKitObjectDetectionResultItem(obj, image));
           }
           resolve(result);
@@ -75,15 +74,15 @@ export function detectObjects(options: MLKitObjectDetectionOptions): Promise<MLK
   });
 }
 
-function getMLKitObjectDetectionResultItem(obj: FIRVisionObject, image: UIImage): MLKitObjectDetectionResultItem {
+function getMLKitObjectDetectionResultItem(detected: MLKObject, image: UIImage): MLKitObjectDetectionResultItem {
   console.log(">> getMLKitObjectDetectionResultItem, image: " + image);
 
   let imageWidth;
   let imageHeight;
 
   // the iOS image is rotated, so compensate for it when reporting these
-  let { x, y } = obj.frame.origin;
-  let { width, height } = obj.frame.size;
+  let { x, y } = detected.frame.origin;
+  let { width, height } = detected.frame.size;
 
   if (image) {
     imageWidth = image.size.width;
@@ -110,29 +109,36 @@ function getMLKitObjectDetectionResultItem(obj: FIRVisionObject, image: UIImage)
     }
   }
 
-  return {
-    id: obj.trackingID,
-    category: ObjectDetectionCategory[obj.classificationCategory],
-    confidence: obj.confidence,
-    ios: obj,
-    bounds: {
-      origin: {
-        x,
-        y
+  for (let i = 0; i < detected.labels.count; i++) {
+    const obj: MLKObjectLabel = detected.labels.objectAtIndex(i);
+    return {
+      id: detected.trackingID,
+      category: ObjectDetectionCategory[obj.text],
+      confidence: obj.confidence,
+      ios: obj,
+      bounds: {
+        origin: {
+          x,
+          y
+        },
+        size: {
+          width,
+          height
+        }
       },
-      size: {
-        width,
-        height
+      image: {
+        width: imageWidth,
+        height: imageHeight
       }
-    },
-    image: {
-      width: imageWidth,
-      height: imageHeight
     }
   }
+
+  return null;
+
+  
 }
 
-function getImage(options: MLKitVisionOptions): FIRVisionImage {
+function getImage(options: MLKitVisionOptions): MLKVisionImage {
   const image: UIImage = options.image instanceof ImageSource ? options.image.ios : options.image.imageSource.ios;
-  return FIRVisionImage.alloc().initWithImage(image);
+  return MLKVisionImage.alloc().initWithImage(image);
 }

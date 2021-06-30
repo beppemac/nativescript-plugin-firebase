@@ -640,8 +640,7 @@ firebase.getRemoteConfig = arg => {
       const firebaseRemoteConfig = FIRRemoteConfig.remoteConfig();
 
       // Enable developer mode to allow for frequent refreshes of the cache
-      // TODO this is deprecated (but not removed yet), see https://firebase.google.com/support/release-notes/ios#remote-config_2
-      firebaseRemoteConfig.configSettings = new FIRRemoteConfigSettings({developerModeEnabled: arg.developerMode || false});
+      firebaseRemoteConfig.configSettings = new FIRRemoteConfigSettings();
 
       const dic: any = NSMutableDictionary.new();
       for (let p in arg.properties) {
@@ -656,7 +655,8 @@ firebase.getRemoteConfig = arg => {
         if (remoteConfigFetchStatus === FIRRemoteConfigFetchStatus.Success ||
             remoteConfigFetchStatus === FIRRemoteConfigFetchStatus.Throttled) {
 
-          const activated = firebaseRemoteConfig.activateFetched();
+          // TODO Verify
+          const activated = firebaseRemoteConfig.activateWithCompletion(null);
 
           const result = {
             lastFetch: firebaseRemoteConfig.lastFetchTime,

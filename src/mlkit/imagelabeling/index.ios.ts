@@ -10,7 +10,7 @@ export class MLKitImageLabeling extends MLKitImageLabelingBase {
   }
 
   protected createSuccessListener(): any {
-    return (labels: NSArray<FIRVisionImageLabel>, error: NSError) => {
+    return (labels: NSArray<MLKImageLabel>, error: NSError) => {
       if (error !== null) {
         console.log(error.localizedDescription);
 
@@ -20,7 +20,7 @@ export class MLKitImageLabeling extends MLKitImageLabelingBase {
         };
 
         for (let i = 0, l = labels.count; i < l; i++) {
-          const label: FIRVisionImageLabel = labels.objectAtIndex(i);
+          const label: MLKImageLabel = labels.objectAtIndex(i);
           result.labels.push({
             text: label.text,
             confidence: label.confidence
@@ -41,11 +41,10 @@ export class MLKitImageLabeling extends MLKitImageLabelingBase {
   }
 }
 
-function getDetector(confidenceThreshold?: number): FIRVisionImageLabeler {
-  const firVision: FIRVision = FIRVision.vision();
-  const fIRVisionOnDeviceImageLabelerOptions = FIRVisionOnDeviceImageLabelerOptions.new();
-  fIRVisionOnDeviceImageLabelerOptions.confidenceThreshold = confidenceThreshold || 0.5;
-  return firVision.onDeviceImageLabelerWithOptions(fIRVisionOnDeviceImageLabelerOptions);
+function getDetector(confidenceThreshold?: number): MLKImageLabeler {
+  const mlkImageLabelerOptions = MLKImageLabelerOptions.new();
+  mlkImageLabelerOptions.confidenceThreshold = confidenceThreshold || 0.5;
+  return MLKImageLabeler.imageLabelerWithOptions(mlkImageLabelerOptions);
 }
 
 export function labelImageOnDevice(options: MLKitImageLabelingOptions): Promise<MLKitImageLabelingOnDeviceResult> {
@@ -53,7 +52,7 @@ export function labelImageOnDevice(options: MLKitImageLabelingOptions): Promise<
     try {
       const labelDetector = getDetector(options.confidenceThreshold);
 
-      labelDetector.processImageCompletion(getImage(options), (labels: NSArray<FIRVisionImageLabel>, error: NSError) => {
+      labelDetector.processImageCompletion(getImage(options), (labels: NSArray<MLKImageLabel>, error: NSError) => {
         if (error !== null) {
           reject(error.localizedDescription);
 
@@ -63,7 +62,7 @@ export function labelImageOnDevice(options: MLKitImageLabelingOptions): Promise<
           };
 
           for (let i = 0, l = labels.count; i < l; i++) {
-            const label: FIRVisionImageLabel = labels.objectAtIndex(i);
+            const label: MLKImageLabel = labels.objectAtIndex(i);
             result.labels.push({
               text: label.text,
               confidence: label.confidence
@@ -81,14 +80,16 @@ export function labelImageOnDevice(options: MLKitImageLabelingOptions): Promise<
 
 export function labelImageCloud(options: MLKitImageLabelingOptions): Promise<MLKitImageLabelingCloudResult> {
   return new Promise((resolve, reject) => {
-    try {
-      const fIRVisionCloudImageLabelerOptions = FIRVisionCloudImageLabelerOptions.new();
-      fIRVisionCloudImageLabelerOptions.confidenceThreshold = options.confidenceThreshold || 0.5;
+    // TODO 
+    reject("NOT IMPLEMENTED YET");
+    /* try {
+      const MLKCloudImageLabelerOptions = MLKCloudImageLabelerOptions.new();
+      MLKCloudImageLabelerOptions.confidenceThreshold = options.confidenceThreshold || 0.5;
 
-      const firVision: FIRVision = FIRVision.vision();
-      const labeler = firVision.cloudImageLabelerWithOptions(fIRVisionCloudImageLabelerOptions);
+      const mlk: MLK = MLK.vision();
+      const labeler = mlk.cloudImageLabelerWithOptions(MLKCloudImageLabelerOptions);
 
-      labeler.processImageCompletion(getImage(options), (labels: NSArray<FIRVisionImageLabel>, error: NSError) => {
+      labeler.processImageCompletion(getImage(options), (labels: NSArray<MLKImageLabel>, error: NSError) => {
         if (error !== null) {
           reject(error.localizedDescription);
 
@@ -98,7 +99,7 @@ export function labelImageCloud(options: MLKitImageLabelingOptions): Promise<MLK
           };
 
           for (let i = 0, l = labels.count; i < l; i++) {
-            const label: FIRVisionImageLabel = labels.objectAtIndex(i);
+            const label: MLKImageLabel = labels.objectAtIndex(i);
             result.labels.push({
               text: label.text,
               confidence: label.confidence
@@ -112,10 +113,11 @@ export function labelImageCloud(options: MLKitImageLabelingOptions): Promise<MLK
       console.log("Error in firebase.mlkit.labelImageCloud: " + ex);
       reject(ex);
     }
+    */
   });
 }
 
-function getImage(options: MLKitVisionOptions): FIRVisionImage {
+function getImage(options: MLKitVisionOptions): MLKVisionImage {
   const image: UIImage = options.image instanceof ImageSource ? options.image.ios : options.image.imageSource.ios;
-  return FIRVisionImage.alloc().initWithImage(image);
+  return MLKVisionImage.alloc().initWithImage(image);
 }

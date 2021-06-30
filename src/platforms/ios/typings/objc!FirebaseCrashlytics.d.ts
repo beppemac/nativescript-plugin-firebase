@@ -7,6 +7,8 @@ declare class FIRCrashlytics extends NSObject {
 
 	static new(): FIRCrashlytics; // inherited from NSObject
 
+	checkAndUpdateUnsentReportsWithCompletion(completion: (p1: FIRCrashlyticsReport) => void): void;
+
 	checkForUnsentReportsWithCompletion(completion: (p1: boolean) => void): void;
 
 	deleteUnsentReports(): void;
@@ -24,6 +26,29 @@ declare class FIRCrashlytics extends NSObject {
 	sendUnsentReports(): void;
 
 	setCrashlyticsCollectionEnabled(enabled: boolean): void;
+
+	setCustomKeysAndValues(keysAndValues: NSDictionary<any, any>): void;
+
+	setCustomValueForKey(value: any, key: string): void;
+
+	setUserID(userID: string): void;
+}
+
+declare class FIRCrashlyticsReport extends NSObject {
+
+	static alloc(): FIRCrashlyticsReport; // inherited from NSObject
+
+	static new(): FIRCrashlyticsReport; // inherited from NSObject
+
+	readonly dateCreated: Date;
+
+	readonly hasCrash: boolean;
+
+	readonly reportID: string;
+
+	log(msg: string): void;
+
+	setCustomKeysAndValues(keysAndValues: NSDictionary<any, any>): void;
 
 	setCustomValueForKey(value: any, key: string): void;
 

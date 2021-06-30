@@ -33,7 +33,7 @@ export class MLKitBarcodeScanner extends MLKitBarcodeScannerBase {
   }
 
   protected createSuccessListener(): any {
-    return (barcodes: NSArray<FIRVisionBarcode>, error: NSError) => {
+    return (barcodes: NSArray<MLKBarcode>, error: NSError) => {
       if (error !== null) {
         console.log(error.localizedDescription);
 
@@ -43,7 +43,7 @@ export class MLKitBarcodeScanner extends MLKitBarcodeScannerBase {
         };
 
         for (let i = 0, l = barcodes.count; i < l; i++) {
-          const barcode: FIRVisionBarcode = barcodes.objectAtIndex(i);
+          const barcode: MLKBarcode = barcodes.objectAtIndex(i);
           const image: UIImage = this.lastVisionImage;
           let imageWidth = image.size.width;
           let imageHeight = image.size.height;
@@ -132,9 +132,9 @@ function getBarcodeDetector(formats?: Array<BarcodeFormat>): any {
   if (formats && formats.length > 0) {
     let barcodeFormats = 0;
     formats.forEach(format => barcodeFormats |= format);
-    return FIRVision.vision().barcodeDetectorWithOptions(FIRVisionBarcodeDetectorOptions.alloc().initWithFormats(barcodeFormats));
+    return MLKBarcodeScanner.barcodeScannerWithOptions(MLKBarcodeScannerOptions.alloc().initWithFormats(barcodeFormats));
   } else {
-    return FIRVision.vision().barcodeDetector();
+    return MLKBarcodeScanner.barcodeScanner();
   }
 }
 
@@ -144,9 +144,9 @@ export function scanBarcodesOnDevice(options: MLKitScanBarcodesOnDeviceOptions):
       const barcodeDetector = getBarcodeDetector(options.formats);
 
       const image: UIImage = options.image instanceof ImageSource ? options.image.ios : options.image.imageSource.ios;
-      const firImage = FIRVisionImage.alloc().initWithImage(image);
+      const mlkVisionImage = MLKVisionImage.alloc().initWithImage(image);
 
-      barcodeDetector.detectInImageCompletion(firImage, (barcodes: NSArray<FIRVisionBarcode>, error: NSError) => {
+      barcodeDetector.detectInImageCompletion(mlkVisionImage, (barcodes: NSArray<MLKBarcode>, error: NSError) => {
         if (error !== null) {
           reject(error.localizedDescription);
 
@@ -156,7 +156,7 @@ export function scanBarcodesOnDevice(options: MLKitScanBarcodesOnDeviceOptions):
           };
 
           for (let i = 0, l = barcodes.count; i < l; i++) {
-            const barcode: FIRVisionBarcode = barcodes.objectAtIndex(i);
+            const barcode: MLKBarcode = barcodes.objectAtIndex(i);
             result.barcodes.push({
               value: barcode.rawValue,
               displayValue: barcode.displayValue,

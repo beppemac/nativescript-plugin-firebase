@@ -10,7 +10,7 @@ export class MLKitAutoML extends MLKitAutoMLBase {
   }
 
   protected createSuccessListener(): any {
-    return (labels: NSArray<FIRVisionImageLabel>, error: NSError) => {
+    return (labels: NSArray<MLKImageLabel>, error: NSError) => {
       if (error !== null) {
         console.log(error.localizedDescription);
 
@@ -20,7 +20,7 @@ export class MLKitAutoML extends MLKitAutoMLBase {
         };
 
         for (let i = 0, l = labels.count; i < l; i++) {
-          const label: FIRVisionImageLabel = labels.objectAtIndex(i);
+          const label: MLKImageLabel = labels.objectAtIndex(i);
           result.labels.push({
             text: label.text,
             confidence: label.confidence
@@ -41,16 +41,16 @@ export class MLKitAutoML extends MLKitAutoMLBase {
   }
 }
 
-function getDetector(localModelResourceFolder: string, confidenceThreshold?: number): FIRVisionImageLabeler {
+function getDetector(localModelResourceFolder: string, confidenceThreshold?: number): MLKImageLabeler {
   const manifestPath = NSBundle.mainBundle.pathForResourceOfTypeInDirectory("manifest", "json", localModelResourceFolder);
-  const fIRAutoMLLocalModel = FIRAutoMLLocalModel.alloc().initWithManifestPath(manifestPath);
+  const fIRAutoMLLocalModel = MLKLocalModel.alloc().initWithManifestPath(manifestPath);
 
-  const options = FIRVisionOnDeviceAutoMLImageLabelerOptions.alloc().initWithLocalModel(fIRAutoMLLocalModel);
+  const options = MLKCustomImageLabelerOptions.alloc().initWithLocalModel(fIRAutoMLLocalModel);
   options.confidenceThreshold = confidenceThreshold || 0.5;
-  const fIRVisionImageLabeler = FIRVision.vision().onDeviceAutoMLImageLabelerWithOptions(options);
+  const mlkImageLabeler = MLKImageLabeler.imageLabelerWithOptions(options);
 
   // TODO also support cloud hosted models
-  return fIRVisionImageLabeler;
+  return mlkImageLabeler;
 }
 
 export function labelImage(options: MLKitAutoMLOptions): Promise<MLKitAutoMLResult> {
@@ -58,7 +58,7 @@ export function labelImage(options: MLKitAutoMLOptions): Promise<MLKitAutoMLResu
     try {
       const labelDetector = getDetector(options.localModelResourceFolder, options.confidenceThreshold);
 
-      labelDetector.processImageCompletion(getImage(options), (labels: NSArray<FIRVisionImageLabel>, error: NSError) => {
+      labelDetector.processImageCompletion(getImage(options), (labels: NSArray<MLKImageLabel>, error: NSError) => {
         if (error !== null) {
           reject(error.localizedDescription);
 
@@ -68,7 +68,7 @@ export function labelImage(options: MLKitAutoMLOptions): Promise<MLKitAutoMLResu
           };
 
           for (let i = 0, l = labels.count; i < l; i++) {
-            const label: FIRVisionImageLabel = labels.objectAtIndex(i);
+            const label: MLKImageLabel = labels.objectAtIndex(i);
             result.labels.push({
               text: label.text,
               confidence: label.confidence
@@ -84,7 +84,7 @@ export function labelImage(options: MLKitAutoMLOptions): Promise<MLKitAutoMLResu
   });
 }
 
-function getImage(options: MLKitVisionOptions): FIRVisionImage {
+function getImage(options: MLKitVisionOptions): MLKVisionImage {
   const image: UIImage = options.image instanceof ImageSource ? options.image.ios : options.image.imageSource.ios;
-  return FIRVisionImage.alloc().initWithImage(image);
+  return MLKVisionImage.alloc().initWithImage(image);
 }

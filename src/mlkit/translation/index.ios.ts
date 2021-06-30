@@ -25,14 +25,13 @@ export function translateText(options: MLKitTranslationOptions): Promise<string>
   });
 }
 
-function _downloadTranslationModelIfNeeded(options: MLKitTranslationModelDownloadOptions): Promise<FIRTranslator> {
-  return new Promise<FIRTranslator>((resolve, reject) => {
+function _downloadTranslationModelIfNeeded(options: MLKitTranslationModelDownloadOptions): Promise<MLKTranslator> {
+  return new Promise<MLKTranslator>((resolve, reject) => {
     try {
-      const firTranslatorOptions = FIRTranslatorOptions.alloc().initWithSourceLanguageTargetLanguage(FIRTranslateLanguageForLanguageCode(options.from), FIRTranslateLanguageForLanguageCode(options.to));
-      const nl = FIRNaturalLanguage.naturalLanguage();
+      const firTranslatorOptions = MLKTranslatorOptions.alloc().initWithSourceLanguageTargetLanguage(options.from, options.to);
 
       // this line currently (since plugin v 10.0.0) errors: CONSOLE ERROR file:///node_modules/@angular/core/fesm5/core.js:26769:0: Error: -[FIRTranslateRemoteModel initWithName:allowsModelUpdates:initialConditions:updateConditions:isBaseModel:]: unrecognized selector sent to instance 0x280567360
-      const firTranslator = nl.translatorWithOptions(firTranslatorOptions);
+      const firTranslator = MLKTranslator.translatorWithOptions(firTranslatorOptions);
 
       const firModelDownloadConditions = FIRModelDownloadConditions.alloc().initWithAllowsCellularAccessAllowsBackgroundDownloading(false, true);
       firTranslator.downloadModelIfNeededWithConditionsCompletion(firModelDownloadConditions, (error: NSError) => {

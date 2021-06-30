@@ -42,8 +42,6 @@ declare const enum FIRInstallationsErrorCode {
 	InvalidConfiguration = 3
 }
 
-declare var FIRInstallationsVersionStr: string;
-
 declare var FirebaseInstallationsVersionNumber: number;
 
 declare var FirebaseInstallationsVersionString: interop.Reference<number>;

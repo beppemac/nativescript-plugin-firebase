@@ -177,3 +177,7 @@ declare class FIRTrace extends NSObject implements FIRPerformanceAttributable {
 
 	valueForIntMetric(metricName: string): number;
 }
+
+declare var FirebasePerformanceVersionNumber: number;
+
+declare var FirebasePerformanceVersionString: interop.Reference<number>;

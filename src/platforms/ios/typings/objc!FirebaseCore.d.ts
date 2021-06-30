@@ -37,6 +37,8 @@ declare class FIRConfiguration extends NSObject {
 	setLoggerLevel(loggerLevel: FIRLoggerLevel): void;
 }
 
+declare function FIRFirebaseVersion(): string;
+
 declare const enum FIRLoggerLevel {
 
 	Error = 3,

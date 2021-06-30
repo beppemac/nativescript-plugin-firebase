@@ -19,6 +19,8 @@ declare class FIRAnalytics extends NSObject {
 
 	static setAnalyticsCollectionEnabled(analyticsCollectionEnabled: boolean): void;
 
+	static setConsent(consentSettings: NSDictionary<string, string>): void;
+
 	static setDefaultEventParameters(parameters: NSDictionary<string, any>): void;
 
 	static setScreenNameScreenClass(screenName: string, screenClassOverride: string): void;
@@ -29,3 +31,11 @@ declare class FIRAnalytics extends NSObject {
 
 	static setUserPropertyStringForName(value: string, name: string): void;
 }
+
+declare var FIRConsentStatusDenied: string;
+
+declare var FIRConsentStatusGranted: string;
+
+declare var FIRConsentTypeAdStorage: string;
+
+declare var FIRConsentTypeAnalyticsStorage: string;

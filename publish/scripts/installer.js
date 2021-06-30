@@ -344,10 +344,10 @@ function writePodFile(result) {
   }
   try {
     fs.writeFileSync(directories.ios + '/Podfile',
-// The MLVision pod requires a minimum of iOS 9, otherwise the build will fail
-(isPresent(result.ml_kit) ? `` : `#`) + `platform :ios, '9.0'
+// The MLVision pod requires a minimum of iOS 10, otherwise the build will fail
+(isPresent(result.ml_kit) ? `` : `#`) + `platform :ios, '10.0'
 
-` + (!isSelected(result.external_push_client_only) ? `` : `#`) + `pod 'Firebase/Core', '~>6.34.0'
+` + (!isSelected(result.external_push_client_only) ? `` : `#`) + `pod 'Firebase/Core', '~>7.11.0'
 
 # Analytics
 ` + (isSelected(result.analytics) || isSelected(result.crashlytics) || (!isSelected(result.external_push_client_only) && !isPresent(result.analytics)) ? `` : `#`) + `pod 'Firebase/Analytics'
@@ -399,19 +399,16 @@ end`) + `
 ` + (isSelected(result.dynamic_links) ? `` : `#`) + `pod 'Firebase/DynamicLinks'
 
 # ML Kit
-` + (isSelected(result.ml_kit) ? `` : `#`) + `pod 'Firebase/MLVision'
-` + (isSelected(result.ml_kit) && isSelected(result.ml_kit_text_recognition) ? `` : `#`) + `pod 'Firebase/MLVisionTextModel'
-` + (isSelected(result.ml_kit) && isSelected(result.ml_kit_barcode_scanning) ? `` : `#`) + `pod 'Firebase/MLVisionBarcodeModel'
-` + (isSelected(result.ml_kit) && isSelected(result.ml_kit_face_detection) ? `` : `#`) + `pod 'Firebase/MLVisionFaceModel'
-` + (isSelected(result.ml_kit) && isSelected(result.ml_kit_image_labeling) ? `` : `#`) + `pod 'Firebase/MLVisionLabelModel'
-` + (isSelected(result.ml_kit) && isSelected(result.ml_kit_object_detection) ? `` : `#`) + `pod 'Firebase/MLVisionObjectDetection'
+` + (isSelected(result.ml_kit) && isSelected(result.ml_kit_text_recognition) ? `` : `#`) + `pod 'GoogleMLKit/TextRecognition'
+` + (isSelected(result.ml_kit) && isSelected(result.ml_kit_barcode_scanning) ? `` : `#`) + `pod 'GoogleMLKit/BarcodeScanning'
+` + (isSelected(result.ml_kit) && isSelected(result.ml_kit_face_detection) ? `` : `#`) + `pod 'GoogleMLKit/FaceDetection'
+` + (isSelected(result.ml_kit) && isSelected(result.ml_kit_image_labeling) ? `` : `#`) + `pod 'GoogleMLKit/ImageLabeling'
+` + (isSelected(result.ml_kit) && isSelected(result.ml_kit_object_detection) ? `` : `#`) + `pod 'GoogleMLKit/ObjectDetection'
 ` + (isSelected(result.ml_kit) && isSelected(result.ml_kit_custom_model) ? `` : `#`) + `pod 'Firebase/MLModelInterpreter'
-` + (isSelected(result.ml_kit) && isSelected(result.ml_kit_automl) ? `` : `#`) + `pod 'Firebase/MLVisionAutoML'
-` + (isSelected(result.ml_kit) && isSelected(result.ml_kit_natural_language_identification) ? `` : `#`) + `pod 'Firebase/MLNaturalLanguage'
-` + (isSelected(result.ml_kit) && isSelected(result.ml_kit_natural_language_identification) ? `` : `#`) + `pod 'Firebase/MLNLLanguageID'
-` + (isSelected(result.ml_kit) && isSelected(result.ml_kit_natural_language_translation) ? `` : `#`) + `pod 'Firebase/MLNLTranslate'
-` + (isSelected(result.ml_kit) && (isSelected(result.ml_kit_natural_language_smartreply) || isSelected(result.ml_kit_natural_language_translation)) ? `` : `#`) + `pod 'Firebase/MLCommon'
-` + (isSelected(result.ml_kit) && isSelected(result.ml_kit_natural_language_smartreply) ? `` : `#`) + `pod 'Firebase/MLNLSmartReply'
+` + (isSelected(result.ml_kit) && isSelected(result.ml_kit_automl) ? `` : `#`) + `pod 'GoogleMLKit/ImageLabelingCustom'
+` + (isSelected(result.ml_kit) && isSelected(result.ml_kit_natural_language_identification) ? `` : `#`) + `pod 'GoogleMLKit/LanguageID'
+` + (isSelected(result.ml_kit) && isSelected(result.ml_kit_natural_language_translation) ? `` : `#`) + `pod 'GoogleMLKit/Translate'
+` + (isSelected(result.ml_kit) && isSelected(result.ml_kit_natural_language_smartreply) ? `` : `#`) + `pod 'GoogleMLKit/SmartReply'
 
 # Facebook Authentication
 ` + (isSelected(result.facebook_auth) ? `` : `#`) + `pod 'FBSDKCoreKit'

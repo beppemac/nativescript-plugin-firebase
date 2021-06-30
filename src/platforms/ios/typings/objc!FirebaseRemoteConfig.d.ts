@@ -15,30 +15,18 @@ declare class FIRRemoteConfig extends NSObject implements NSFastEnumeration {
 
 	readonly lastFetchStatus: FIRRemoteConfigFetchStatus;
 
-	lastFetchTime: Date;
+	readonly lastFetchTime: Date;
 	[Symbol.iterator](): Iterator<any>;
-
-	activateFetched(): boolean;
 
 	activateWithCompletion(completion: (p1: boolean, p2: NSError) => void): void;
 
-	activateWithCompletionHandler(completionHandler: (p1: NSError) => void): void;
-
 	allKeysFromSource(source: FIRRemoteConfigSource): NSArray<string>;
 
-	allKeysFromSourceNamespace(source: FIRRemoteConfigSource, aNamespace: string): NSArray<string>;
-
 	configValueForKey(key: string): FIRRemoteConfigValue;
-
-	configValueForKeyNamespace(key: string, aNamespace: string): FIRRemoteConfigValue;
-
-	configValueForKeyNamespaceSource(key: string, aNamespace: string, source: FIRRemoteConfigSource): FIRRemoteConfigValue;
 
 	configValueForKeySource(key: string, source: FIRRemoteConfigSource): FIRRemoteConfigValue;
 
 	defaultValueForKey(key: string): FIRRemoteConfigValue;
-
-	defaultValueForKeyNamespace(key: string, aNamespace: string): FIRRemoteConfigValue;
 
 	ensureInitializedWithCompletionHandler(completionHandler: (p1: NSError) => void): void;
 
@@ -50,17 +38,11 @@ declare class FIRRemoteConfig extends NSObject implements NSFastEnumeration {
 
 	keysWithPrefix(prefix: string): NSSet<string>;
 
-	keysWithPrefixNamespace(prefix: string, aNamespace: string): NSSet<string>;
-
 	objectForKeyedSubscript(key: string): FIRRemoteConfigValue;
 
 	setDefaults(defaults: NSDictionary<string, NSObject>): void;
 
 	setDefaultsFromPlistFileName(fileName: string): void;
-
-	setDefaultsFromPlistFileNameNamespace(fileName: string, aNamespace: string): void;
-
-	setDefaultsNamespace(defaults: NSDictionary<string, NSObject>, aNamespace: string): void;
 }
 
 declare const enum FIRRemoteConfigError {
@@ -102,13 +84,7 @@ declare class FIRRemoteConfigSettings extends NSObject {
 
 	fetchTimeout: number;
 
-	readonly isDeveloperModeEnabled: boolean;
-
 	minimumFetchInterval: number;
-
-	constructor(o: { developerModeEnabled: boolean; });
-
-	initWithDeveloperModeEnabled(developerModeEnabled: boolean): this;
 }
 
 declare const enum FIRRemoteConfigSource {

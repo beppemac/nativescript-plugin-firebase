@@ -12,9 +12,8 @@ export function identifyNaturalLanguage(options: MLKitNaturalLanguageIdentificat
         return;
       }
 
-      const naturalLanguage = FIRNaturalLanguage.naturalLanguage();
-      const languageId = naturalLanguage.languageIdentificationWithOptions(
-          FIRLanguageIdentificationOptions.alloc().initWithConfidenceThreshold(options.confidenceThreshold || 0.5));
+      const languageId = MLKLanguageIdentification.languageIdentificationWithOptions(
+          MLKLanguageIdentificationOptions.alloc().initWithConfidenceThreshold(options.confidenceThreshold || 0.5));
 
       languageId.identifyLanguageForTextCompletion(options.text, (languageCode: string, error: NSError) => {
         if (error !== null) {
@@ -38,15 +37,15 @@ export function identifyNaturalLanguage(options: MLKitNaturalLanguageIdentificat
 export function indentifyPossibleLanguages(options: MLKitNaturalLanguageIdentificationOptions): Promise<Array<MLKitNaturalLanguageIdentificationLanguage>> {
   return new Promise((resolve, reject) => {
     try {
-      const naturalLanguage = FIRNaturalLanguage.naturalLanguage();
-      const languageId = naturalLanguage.languageIdentificationWithOptions(
-          FIRLanguageIdentificationOptions.alloc().initWithConfidenceThreshold(options.confidenceThreshold || 0.01));
+      
+      const languageId = MLKLanguageIdentification.languageIdentificationWithOptions(
+          MLKLanguageIdentificationOptions.alloc().initWithConfidenceThreshold(options.confidenceThreshold || 0.01));
 
-      languageId.identifyPossibleLanguagesForTextCompletion(options.text, (languages: NSArray<FIRIdentifiedLanguage>, error: NSError) => {
+      languageId.identifyPossibleLanguagesForTextCompletion(options.text, (languages: NSArray<MLKIdentifiedLanguage>, error: NSError) => {
         if (error !== null) {
           console.log("Failed with error: " + error.localizedDescription);
           reject(error.localizedDescription);
-        } else if (languages.count === 1 && languages.objectAtIndex(0).languageCode === "und") { // und = undetermined
+        } else if (languages.count === 1 && languages.objectAtIndex(0).languageTag === "und") { // und = undetermined
           console.log("No language was identified");
           resolve([]);
         } else {
@@ -54,7 +53,7 @@ export function indentifyPossibleLanguages(options: MLKitNaturalLanguageIdentifi
           for (let i = 0; i < languages.count; i++) {
             const l = languages.objectAtIndex(i);
             langs.push({
-              languageCode: l.languageCode,
+              languageCode: l.languageTag,
               confidence: l.confidence
             })
           }

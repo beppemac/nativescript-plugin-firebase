@@ -10,8 +10,6 @@ declare class FIRActionCodeInfo extends NSObject {
 	readonly operation: FIRActionCodeOperation;
 
 	readonly previousEmail: string;
-
-	dataForKey(key: FIRActionDataKey): string;
 }
 
 declare const enum FIRActionCodeOperation {
@@ -75,13 +73,6 @@ declare class FIRActionCodeURL extends NSObject {
 	readonly operation: FIRActionCodeOperation;
 }
 
-declare const enum FIRActionDataKey {
-
-	CodeEmailKey = 0,
-
-	CodeFromEmailKey = 1
-}
-
 declare class FIRAdditionalUserInfo extends NSObject {
 
 	static alloc(): FIRAdditionalUserInfo; // inherited from NSObject
@@ -117,6 +108,8 @@ declare class FIRAuth extends NSObject {
 
 	settings: FIRAuthSettings;
 
+	shareAuthStateAcrossDevices: boolean;
+
 	tenantID: string;
 
 	readonly userAccessGroup: string;
@@ -137,8 +130,6 @@ declare class FIRAuth extends NSObject {
 
 	createUserWithEmailPasswordCompletion(email: string, password: string, completion: (p1: FIRAuthDataResult, p2: NSError) => void): void;
 
-	fetchProvidersForEmailCompletion(email: string, completion: (p1: NSArray<string>, p2: NSError) => void): void;
-
 	fetchSignInMethodsForEmailCompletion(email: string, completion: (p1: NSArray<string>, p2: NSError) => void): void;
 
 	getStoredUserForAccessGroupError(accessGroup: string): FIRUser;
@@ -157,8 +148,6 @@ declare class FIRAuth extends NSObject {
 
 	setAPNSTokenType(token: NSData, type: FIRAuthAPNSTokenType): void;
 
-	signInAndRetrieveDataWithCredentialCompletion(credential: FIRAuthCredential, completion: (p1: FIRAuthDataResult, p2: NSError) => void): void;
-
 	signInAnonymouslyWithCompletion(completion: (p1: FIRAuthDataResult, p2: NSError) => void): void;
 
 	signInWithCredentialCompletion(credential: FIRAuthCredential, completion: (p1: FIRAuthDataResult, p2: NSError) => void): void;
@@ -176,6 +165,8 @@ declare class FIRAuth extends NSObject {
 	updateCurrentUserCompletion(user: FIRUser, completion: (p1: NSError) => void): void;
 
 	useAppLanguage(): void;
+
+	useEmulatorWithHostPort(host: string, port: number): void;
 
 	useUserAccessGroupError(accessGroup: string): boolean;
 
@@ -795,8 +786,6 @@ declare class FIRUser extends NSObject implements FIRUserInfo {
 
 	isMemberOfClass(aClass: typeof NSObject): boolean;
 
-	linkAndRetrieveDataWithCredentialCompletion(credential: FIRAuthCredential, completion: (p1: FIRAuthDataResult, p2: NSError) => void): void;
-
 	linkWithCredentialCompletion(credential: FIRAuthCredential, completion: (p1: FIRAuthDataResult, p2: NSError) => void): void;
 
 	linkWithProviderUIDelegateCompletion(provider: FIRFederatedAuthProvider, UIDelegate: FIRAuthUIDelegate, completion: (p1: FIRAuthDataResult, p2: NSError) => void): void;
@@ -808,8 +797,6 @@ declare class FIRUser extends NSObject implements FIRUserInfo {
 	performSelectorWithObjectWithObject(aSelector: string, object1: any, object2: any): any;
 
 	profileChangeRequest(): FIRUserProfileChangeRequest;
-
-	reauthenticateAndRetrieveDataWithCredentialCompletion(credential: FIRAuthCredential, completion: (p1: FIRAuthDataResult, p2: NSError) => void): void;
 
 	reauthenticateWithCredentialCompletion(credential: FIRAuthCredential, completion: (p1: FIRAuthDataResult, p2: NSError) => void): void;
 
@@ -883,10 +870,6 @@ declare class FIRUserProfileChangeRequest extends NSObject {
 	commitChangesWithCompletion(completion: (p1: NSError) => void): void;
 }
 
-declare var FirebaseAuthVersionNum: number;
-
 declare var FirebaseAuthVersionNumber: number;
-
-declare var FirebaseAuthVersionStr: string;
 
 declare var FirebaseAuthVersionString: interop.Reference<number>;

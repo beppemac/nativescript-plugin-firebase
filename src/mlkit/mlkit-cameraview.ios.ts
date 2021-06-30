@@ -125,28 +125,6 @@ export abstract class MLKitCameraView extends MLKitCameraViewBase {
 
   abstract rotateRecording(): boolean;
 
-  getVisionOrientation(imageOrientation: UIImageOrientation): FIRVisionDetectorImageOrientation {
-    if (imageOrientation === UIImageOrientation.Up) {
-      return FIRVisionDetectorImageOrientation.TopLeft;
-    } else if (imageOrientation === UIImageOrientation.Down) {
-      return FIRVisionDetectorImageOrientation.BottomRight;
-    } else if (imageOrientation === UIImageOrientation.Left) {
-      return FIRVisionDetectorImageOrientation.LeftBottom;
-    } else if (imageOrientation === UIImageOrientation.Right) {
-      return FIRVisionDetectorImageOrientation.RightTop;
-    } else if (imageOrientation === UIImageOrientation.UpMirrored) {
-      return FIRVisionDetectorImageOrientation.TopRight;
-    } else if (imageOrientation === UIImageOrientation.DownMirrored) {
-      return FIRVisionDetectorImageOrientation.BottomLeft;
-    } else if (imageOrientation === UIImageOrientation.LeftMirrored) {
-      return FIRVisionDetectorImageOrientation.LeftTop;
-    } else if (imageOrientation === UIImageOrientation.RightMirrored) {
-      return FIRVisionDetectorImageOrientation.RightBottom;
-    } else {
-      return FIRVisionDetectorImageOrientation.TopLeft;
-    }
-  }
-
   protected updateTorch(): void {
     const device = this.captureDevice;
     if (device && device.hasTorch && device.lockForConfiguration()) {
@@ -224,13 +202,13 @@ class TNSMLKitCameraViewDelegateImpl extends NSObject implements TNSMLKitCameraV
     this.owner.get().lastVisionImage = image;
 
     if (this.detector.detectInImageCompletion) {
-      this.detector.detectInImageCompletion(this.uiImageToFIRVisionImage(image), (result, error) => {
+      this.detector.detectInImageCompletion(this.uiImageToMLKVisionImage(image), (result, error) => {
         this.onSuccessListener(result, error);
         onComplete();
       });
 
     } else if (this.detector.processImageCompletion) {
-      this.detector.processImageCompletion(this.uiImageToFIRVisionImage(image), (result, error) => {
+      this.detector.processImageCompletion(this.uiImageToMLKVisionImage(image), (result, error) => {
         this.onSuccessListener(result, error);
         onComplete();
       });
@@ -240,12 +218,10 @@ class TNSMLKitCameraViewDelegateImpl extends NSObject implements TNSMLKitCameraV
     }
   }
 
-  private uiImageToFIRVisionImage(image: UIImage): FIRVisionImage {
+  private uiImageToMLKVisionImage(image: UIImage): MLKVisionImage {
     image = this.preProcessImageCallback(image);
-    const fIRVisionImage = FIRVisionImage.alloc().initWithImage(image);
-    const fIRVisionImageMetadata = FIRVisionImageMetadata.new();
-    fIRVisionImageMetadata.orientation = this.owner.get().getVisionOrientation(image.imageOrientation);
-    fIRVisionImage.metadata = fIRVisionImageMetadata;
-    return fIRVisionImage;
+    const mlkVisionImage = MLKVisionImage.alloc().initWithImage(image);
+    mlkVisionImage.orientation = image.imageOrientation;
+    return mlkVisionImage;
   }
 }

@@ -17,23 +17,23 @@ declare class FIRMessaging extends NSObject {
 
 	delegate: FIRMessagingDelegate;
 
-	readonly isDirectChannelEstablished: boolean;
-
-	shouldEstablishDirectChannel: boolean;
-
 	appDidReceiveMessage(message: NSDictionary<any, any>): FIRMessagingMessageInfo;
+
+	deleteDataWithCompletion(completion: (p1: NSError) => void): void;
 
 	deleteFCMTokenForSenderIDCompletion(senderID: string, completion: (p1: NSError) => void): void;
 
-	retrieveFCMTokenForSenderIDCompletion(senderID: string, completion: (p1: string, p2: NSError) => void): void;
+	deleteTokenWithCompletion(completion: (p1: NSError) => void): void;
 
-	sendMessageToWithMessageIDTimeToLive(message: NSDictionary<any, any>, receiver: string, messageID: string, ttl: number): void;
+	retrieveFCMTokenForSenderIDCompletion(senderID: string, completion: (p1: string, p2: NSError) => void): void;
 
 	setAPNSTokenType(apnsToken: NSData, type: FIRMessagingAPNSTokenType): void;
 
 	subscribeToTopic(topic: string): void;
 
 	subscribeToTopicCompletion(topic: string, completion: (p1: NSError) => void): void;
+
+	tokenWithCompletion(completion: (p1: string, p2: NSError) => void): void;
 
 	unsubscribeFromTopic(topic: string): void;
 
@@ -49,11 +49,7 @@ declare const enum FIRMessagingAPNSTokenType {
 	Prod = 2
 }
 
-declare var FIRMessagingConnectionStateChangedNotification: string;
-
 interface FIRMessagingDelegate extends NSObjectProtocol {
-
-	messagingDidReceiveMessage?(messaging: FIRMessaging, remoteMessage: FIRMessagingRemoteMessage): void;
 
 	messagingDidReceiveRegistrationToken?(messaging: FIRMessaging, fcmToken: string): void;
 }
@@ -106,24 +102,7 @@ declare const enum FIRMessagingMessageStatus {
 	New = 1
 }
 
-declare var FIRMessagingMessagesDeletedNotification: string;
-
 declare var FIRMessagingRegistrationTokenRefreshedNotification: string;
-
-declare class FIRMessagingRemoteMessage extends NSObject {
-
-	static alloc(): FIRMessagingRemoteMessage; // inherited from NSObject
-
-	static new(): FIRMessagingRemoteMessage; // inherited from NSObject
-
-	readonly appData: NSDictionary<any, any>;
-
-	readonly messageID: string;
-}
-
-declare var FIRMessagingSendErrorNotification: string;
-
-declare var FIRMessagingSendSuccessNotification: string;
 
 declare var FirebaseMessagingVersionNumber: number;
 

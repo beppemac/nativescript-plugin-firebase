@@ -180,9 +180,21 @@ declare class FIRFirestore extends NSObject {
 
 	enableNetworkWithCompletion(completion: (p1: NSError) => void): void;
 
+	getQueryNamedCompletion(name: string, completion: (p1: FIRQuery) => void): void;
+
+	loadBundle(bundleData: NSData): FIRLoadBundleTask;
+
+	loadBundleCompletion(bundleData: NSData, completion: (p1: FIRLoadBundleTaskProgress, p2: NSError) => void): FIRLoadBundleTask;
+
+	loadBundleStream(bundleStream: NSInputStream): FIRLoadBundleTask;
+
+	loadBundleStreamCompletion(bundleStream: NSInputStream, completion: (p1: FIRLoadBundleTaskProgress, p2: NSError) => void): FIRLoadBundleTask;
+
 	runTransactionWithBlockCompletion(updateBlock: (p1: FIRTransaction, p2: interop.Pointer | interop.Reference<NSError>) => any, completion: (p1: any, p2: NSError) => void): void;
 
 	terminateWithCompletion(completion: (p1: NSError) => void): void;
+
+	useEmulatorWithHostPort(host: string, port: number): void;
 
 	waitForPendingWritesWithCompletion(completion: (p1: NSError) => void): void;
 }
@@ -242,8 +254,6 @@ declare class FIRFirestoreSettings extends NSObject implements NSCopying {
 
 	sslEnabled: boolean;
 
-	timestampsInSnapshotsEnabled: boolean;
-
 	copyWithZone(zone: interop.Pointer | interop.Reference<any>): any;
 }
 
@@ -281,6 +291,45 @@ declare var FIRListenerRegistration: {
 
 	prototype: FIRListenerRegistration;
 };
+
+declare class FIRLoadBundleTask extends NSObject {
+
+	static alloc(): FIRLoadBundleTask; // inherited from NSObject
+
+	static new(): FIRLoadBundleTask; // inherited from NSObject
+
+	addObserver(observer: (p1: FIRLoadBundleTaskProgress) => void): number;
+
+	removeAllObservers(): void;
+
+	removeObserverWithHandle(handle: number): void;
+}
+
+declare class FIRLoadBundleTaskProgress extends NSObject {
+
+	static alloc(): FIRLoadBundleTaskProgress; // inherited from NSObject
+
+	static new(): FIRLoadBundleTaskProgress; // inherited from NSObject
+
+	readonly bytesLoaded: number;
+
+	readonly documentsLoaded: number;
+
+	readonly state: FIRLoadBundleTaskState;
+
+	readonly totalBytes: number;
+
+	readonly totalDocuments: number;
+}
+
+declare const enum FIRLoadBundleTaskState {
+
+	Error = 0,
+
+	InProgress = 1,
+
+	Success = 2
+}
 
 declare class FIRQuery extends NSObject {
 

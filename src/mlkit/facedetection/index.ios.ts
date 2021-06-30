@@ -14,7 +14,7 @@ export class MLKitFaceDetection extends MLKitFaceDetectionBase {
   }
 
   protected createSuccessListener(): any {
-    return (faces: NSArray<FIRVisionFace>, error: NSError) => {
+    return (faces: NSArray<MLKFace>, error: NSError) => {
       if (error !== null) {
         console.log(error.localizedDescription);
 
@@ -24,7 +24,7 @@ export class MLKitFaceDetection extends MLKitFaceDetectionBase {
         };
 
         for (let i = 0, l = faces.count; i < l; i++) {
-          const face: FIRVisionFace = faces.objectAtIndex(i);
+          const face: MLKFace = faces.objectAtIndex(i);
           result.faces.push({
             smilingProbability: face.hasSmilingProbability ? face.smilingProbability : undefined,
             leftEyeOpenProbability: face.hasLeftEyeOpenProbability ? face.leftEyeOpenProbability : undefined,
@@ -48,32 +48,23 @@ export class MLKitFaceDetection extends MLKitFaceDetectionBase {
   protected rotateRecording(): boolean {
     return false;
   }
-
-  getVisionOrientation(imageOrientation: UIImageOrientation): FIRVisionDetectorImageOrientation {
-    if (imageOrientation === UIImageOrientation.Up && !Utils.ios.isLandscape()) {
-      return FIRVisionDetectorImageOrientation.RightTop;
-    } else {
-      return super.getVisionOrientation(imageOrientation);
-    }
-  }
 }
 
-function getDetector(options: MLKitDetectFacesOnDeviceOptions): FIRVisionFaceDetector {
-  const firVision: FIRVision = FIRVision.vision();
-  const firOptions = FIRVisionFaceDetectorOptions.new();
-  firOptions.performanceMode = options.detectionMode === "accurate" ? FIRVisionFaceDetectorPerformanceMode.Accurate : FIRVisionFaceDetectorPerformanceMode.Fast;
-  firOptions.landmarkMode = FIRVisionFaceDetectorLandmarkMode.All; // TODO make configurable
-  firOptions.classificationMode = FIRVisionFaceDetectorClassificationMode.All; // TODO make configurable
+function getDetector(options: MLKitDetectFacesOnDeviceOptions): MLKFaceDetector {
+  const firOptions = MLKFaceDetectorOptions.new();
+  firOptions.performanceMode = options.detectionMode === "accurate" ? MLKFaceDetectorPerformanceModeAccurate : MLKFaceDetectorPerformanceModeFast;
+  firOptions.landmarkMode = MLKFaceDetectorLandmarkModeAll; // TODO make configurable
+  firOptions.classificationMode = MLKFaceDetectorClassificationModeAll; // TODO make configurable
   firOptions.minFaceSize = options.minimumFaceSize;
   firOptions.trackingEnabled = options.enableFaceTracking === true;
-  return firVision.faceDetectorWithOptions(firOptions);
+  return MLKFaceDetector.faceDetectorWithOptions(firOptions);
 }
 
 export function detectFacesOnDevice(options: MLKitDetectFacesOnDeviceOptions): Promise<MLKitDetectFacesOnDeviceResult> {
   return new Promise((resolve, reject) => {
     try {
       const faceDetector = getDetector(options);
-      faceDetector.processImageCompletion(getImage(options), (faces: NSArray<FIRVisionFace>, error: NSError) => {
+      faceDetector.processImageCompletion(getImage(options), (faces: NSArray<MLKFace>, error: NSError) => {
         if (error !== null) {
           reject(error.localizedDescription);
 
@@ -83,7 +74,7 @@ export function detectFacesOnDevice(options: MLKitDetectFacesOnDeviceOptions): P
           };
 
           for (let i = 0, l = faces.count; i < l; i++) {
-            const face: FIRVisionFace = faces.objectAtIndex(i);
+            const face: MLKFace = faces.objectAtIndex(i);
             result.faces.push({
               smilingProbability: face.hasSmilingProbability ? face.smilingProbability : undefined,
               leftEyeOpenProbability: face.hasLeftEyeOpenProbability ? face.leftEyeOpenProbability : undefined,
@@ -104,8 +95,8 @@ export function detectFacesOnDevice(options: MLKitDetectFacesOnDeviceOptions): P
   });
 }
 
-function getImage(options: MLKitVisionOptions): FIRVisionImage {
+function getImage(options: MLKitVisionOptions): MLKVisionImage {
   const image = options.image instanceof ImageSource ? options.image.ios : options.image.imageSource.ios;
   const newImage = UIImage.alloc().initWithCGImageScaleOrientation(image.CGImage, 1, UIImageOrientation.Up);
-  return FIRVisionImage.alloc().initWithImage(newImage);
+  return MLKVisionImage.alloc().initWithImage(newImage);
 }

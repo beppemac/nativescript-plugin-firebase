@@ -6,12 +6,11 @@ import { MLKitRecognizeTextResultBlock, MLKitRecognizeTextResultLine } from "./i
 
 export class MLKitTextRecognition extends MLKitTextRecognitionBase {
   protected createDetector(): any {
-    const firVision: FIRVision = FIRVision.vision();
-    return firVision.onDeviceTextRecognizer();
+    return MLKTextRecognizer.textRecognizer();
   }
 
   protected createSuccessListener(): any {
-    return (visionText: FIRVisionText, error: NSError) => {
+    return (visionText: MLKText, error: NSError) => {
       if (error !== null) {
         console.log(error.localizedDescription);
       } else if (visionText !== null) {
@@ -29,7 +28,7 @@ export class MLKitTextRecognition extends MLKitTextRecognitionBase {
   }
 }
 
-function getResult(visionText: FIRVisionText): MLKitRecognizeTextResult {
+function getResult(visionText: MLKText): MLKitRecognizeTextResult {
   if (visionText === null) {
     return {};
   }
@@ -41,23 +40,23 @@ function getResult(visionText: FIRVisionText): MLKitRecognizeTextResult {
   };
 
   for (let i = 0, l = visionText.blocks.count; i < l; i++) {
-    const feature: FIRVisionTextBlock = visionText.blocks.objectAtIndex(i);
+    const feature: MLKTextBlock = visionText.blocks.objectAtIndex(i);
     const resultFeature = <MLKitRecognizeTextResultBlock>{
       text: feature.text,
-      confidence: feature.confidence,
+      // confidence: feature.confidence,
       bounds: feature.frame,
       lines: []
     };
 
-    const addLineToResult = (line: FIRVisionTextLine): void => {
+    const addLineToResult = (line: MLKTextLine): void => {
       const resultLine = <MLKitRecognizeTextResultLine>{
         text: feature.text,
-        confidence: line.confidence,
+        // confidence: line.confidence,
         bounds: line.frame,
         elements: []
       };
       for (let a = 0, m = line.elements.count; a < m; a++) {
-        const element: FIRVisionTextElement = line.elements.objectAtIndex(a);
+        const element: MLKTextElement = line.elements.objectAtIndex(a);
         resultLine.elements.push({
           text: element.text,
           bounds: element.frame,
@@ -67,15 +66,15 @@ function getResult(visionText: FIRVisionText): MLKitRecognizeTextResult {
     };
 
     // TODO
-    if (feature instanceof FIRVisionTextBlock) {
-      const textBlock = <FIRVisionTextBlock>feature;
+    if (feature instanceof MLKTextBlock) {
+      const textBlock = <MLKTextBlock>feature;
       for (let j = 0, k = textBlock.lines.count; j < k; j++) {
         addLineToResult(textBlock.lines.objectAtIndex(j));
       }
     }
 
     // TODO
-    if (feature instanceof FIRVisionTextLine) {
+    if (feature instanceof MLKTextLine) {
       addLineToResult(feature);
     }
 
@@ -87,10 +86,9 @@ function getResult(visionText: FIRVisionText): MLKitRecognizeTextResult {
 export function recognizeTextOnDevice(options: MLKitRecognizeTextOnDeviceOptions): Promise<MLKitRecognizeTextResult> {
   return new Promise((resolve, reject) => {
     try {
-      const firVision: FIRVision = FIRVision.vision();
-      const textDetector: FIRVisionTextRecognizer = firVision.onDeviceTextRecognizer();
+      const textDetector: MLKTextRecognizer = MLKTextRecognizer.textRecognizer();
 
-      textDetector.processImageCompletion(getImage(options), (visionText: FIRVisionText, error: NSError) => {
+      textDetector.processImageCompletion(getImage(options), (visionText: MLKText, error: NSError) => {
         if (error !== null) {
           reject(error.localizedDescription);
         } else {
@@ -106,16 +104,19 @@ export function recognizeTextOnDevice(options: MLKitRecognizeTextOnDeviceOptions
 
 export function recognizeTextCloud(options: MLKitRecognizeTextCloudOptions): Promise<MLKitRecognizeTextResult> {
   return new Promise((resolve, reject) => {
+    // TODO 
+    reject("NOT IMPLEMENTED YET");
+    /*
     try {
-      const fIRVisionCloudDetectorOptions = FIRVisionCloudTextRecognizerOptions.new();
-      fIRVisionCloudDetectorOptions.modelType = FIRVisionCloudTextModelType.Sparse;
-      // fIRVisionCloudDetectorOptions.modelType = options.modelType === "latest" ? FIRVisionCloudModelType.Latest : FIRVisionCloudModelType.Stable;
-      // fIRVisionCloudDetectorOptions.maxResults = options.maxResults || 10;
+      const MLKCloudDetectorOptions = MLKCloudTextRecognizerOptions.new();
+      MLKCloudDetectorOptions.modelType = MLKCloudTextModelType.Sparse;
+      // MLKCloudDetectorOptions.modelType = options.modelType === "latest" ? MLKCloudModelType.Latest : MLKCloudModelType.Stable;
+      // MLKCloudDetectorOptions.maxResults = options.maxResults || 10;
 
-      const firVision: FIRVision = FIRVision.vision();
-      const textDetector = firVision.cloudTextRecognizerWithOptions(fIRVisionCloudDetectorOptions);
+      const MLK: MLK = MLK.vision();
+      const textDetector = MLK.cloudTextRecognizerWithOptions(MLKCloudDetectorOptions);
 
-      textDetector.processImageCompletion(getImage(options), (visionText: FIRVisionText, error: NSError) => {
+      textDetector.processImageCompletion(getImage(options), (visionText: MLKText, error: NSError) => {
         console.log(">>> recognizeTextCloud error? " + error + ", visionText? " + visionText);
         if (error !== null) {
           reject(error.localizedDescription);
@@ -129,10 +130,11 @@ export function recognizeTextCloud(options: MLKitRecognizeTextCloudOptions): Pro
       console.log("Error in firebase.mlkit.recognizeTextCloud: " + ex);
       reject(ex);
     }
+    */
   });
 }
 
-function getImage(options: MLKitVisionOptions): FIRVisionImage {
+function getImage(options: MLKitVisionOptions): MLKVisionImage {
   const image: UIImage = options.image instanceof ImageSource ? options.image.ios : options.image.imageSource.ios;
-  return FIRVisionImage.alloc().initWithImage(image);
+  return MLKVisionImage.alloc().initWithImage(image);
 }

@@ -7,6 +7,5 @@ export declare abstract class MLKitCameraView extends MLKitCameraViewBase {
 
   protected abstract createSuccessListener(): any;
 
-  getVisionOrientation(imageOrientation: any): any;
 }
 

@@ -575,7 +575,7 @@ class FIRMessagingDelegateImpl extends NSObject implements FIRMessagingDelegate 
     return this;
   }
 
-  public messagingDidReceiveMessage(messaging: FIRMessaging, remoteMessage: FIRMessagingRemoteMessage): void {
+  public messagingDidReceiveMessage(messaging: FIRMessaging, remoteMessage: any): void {
     this.callback(remoteMessage.appData);
   }
 
