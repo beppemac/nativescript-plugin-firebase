@@ -1,7 +1,5 @@
 import { ENABLE_CRASHLYTICS_HINT } from "./crashlytics-common";
 
-declare const com, java: any;
-
 export function sendCrashLog(exception: any /* java.lang.Exception */): void {
   if (isCrashlyticsAvailable()) {
     com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().recordException(exception);
