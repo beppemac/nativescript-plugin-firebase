@@ -29,8 +29,9 @@ export abstract class MLKitCameraView extends MLKitCameraViewBase {
   protected rotation;
   public lastVisionImage;
   private detector: any;
-  private camera;
-  private metadata;
+  private camera: android.hardware.Camera;
+  private metadata: { format: number, height: number, width: number };
+  private rotationDegrees: number = 0;
 
   disposeNativeView(): void {
     super.disposeNativeView();
@@ -48,6 +49,7 @@ export abstract class MLKitCameraView extends MLKitCameraViewBase {
       }
       this.camera.release();
       this.camera = null;
+
     }
     this.bytesToByteBuffer.clear();
 
@@ -86,9 +88,9 @@ export abstract class MLKitCameraView extends MLKitCameraViewBase {
 
         // invoke the permission dialog
         ActivityCompatClass.requestPermissions(
-            Application.android.foregroundActivity || Application.android.startActivity,
-            [android.Manifest.permission.CAMERA],
-            CAMERA_PERMISSION_REQUEST_CODE);
+          Application.android.foregroundActivity || Application.android.startActivity,
+          [android.Manifest.permission.CAMERA],
+          CAMERA_PERMISSION_REQUEST_CODE);
       }
     } else {
       console.log("There's no Camera on this device :(");
@@ -103,16 +105,16 @@ export abstract class MLKitCameraView extends MLKitCameraViewBase {
 
   private hasCamera(): boolean {
     return !!Utils.android
-        .getApplicationContext()
-        .getPackageManager()
-        .hasSystemFeature("android.hardware.camera");
+      .getApplicationContext()
+      .getPackageManager()
+      .hasSystemFeature("android.hardware.camera");
   }
 
   private wasCameraPermissionGranted() {
     let hasPermission = android.os.Build.VERSION.SDK_INT < 23; // Android M. (6.0)
     if (!hasPermission) {
       hasPermission = android.content.pm.PackageManager.PERMISSION_GRANTED ===
-          ContentPackageName.ContextCompat.checkSelfPermission(Utils.android.getApplicationContext(), android.Manifest.permission.CAMERA);
+        ContentPackageName.ContextCompat.checkSelfPermission(Utils.android.getApplicationContext(), android.Manifest.permission.CAMERA);
     }
     return hasPermission;
   }
@@ -143,6 +145,22 @@ export abstract class MLKitCameraView extends MLKitCameraViewBase {
             break;
           }
         }
+
+        if (this.camera != null) {
+          Application.off("orientationChanged");
+
+          this.camera.stopPreview();
+
+          this.camera.setPreviewCallbackWithBuffer(null);
+          try {
+            this.camera.setPreviewDisplay(null);
+          } catch (e) {
+            console.log("Error cleaning up the ML Kit camera (you can probably ignore this): " + e);
+          }
+          this.camera.release();
+          this.camera = null;
+        }
+
         this.camera = android.hardware.Camera.open(requestedCameraId);
 
         let sizePair = this.selectSizePair(this.camera, 1400, 1200); // TODO based on wrapping frame
@@ -216,18 +234,24 @@ export abstract class MLKitCameraView extends MLKitCameraViewBase {
 
             let data = this.pendingFrameData;
 
-            if (this.detector.processImage) {
-              this.lastVisionImage = com.google.firebase.ml.vision.common.FirebaseVisionImage.fromByteBuffer(data, this.metadata);
+            if (this.detector.process) {
+              this.lastVisionImage = com.google.mlkit.vision.common.InputImage.fromByteBuffer(data, this.metadata.width, this.metadata.height, this.rotationDegrees, this.metadata.format);
               this.detector
-                  .processImage(this.lastVisionImage)
-                  .addOnSuccessListener(onSuccessListener)
-                  .addOnFailureListener(onFailureListener);
+                .process(this.lastVisionImage)
+                .addOnSuccessListener(onSuccessListener)
+                .addOnFailureListener(onFailureListener)
+            } else if (this.detector.processImage) {
+              this.lastVisionImage = com.google.mlkit.vision.common.InputImage.fromByteBuffer(data, this.metadata.width, this.metadata.height, this.rotationDegrees, this.metadata.format);
+              this.detector
+                .processImage(this.lastVisionImage)
+                .addOnSuccessListener(onSuccessListener)
+                .addOnFailureListener(onFailureListener);
             } else if (this.detector.detectInImage) {
-              this.lastVisionImage = com.google.firebase.ml.vision.common.FirebaseVisionImage.fromByteBuffer(data, this.metadata);
+              this.lastVisionImage = com.google.mlkit.vision.common.InputImage.fromByteBuffer(data, this.metadata.width, this.metadata.height, this.rotationDegrees, this.metadata.format);
               this.detector
-                  .detectInImage(this.lastVisionImage)
-                  .addOnSuccessListener(onSuccessListener)
-                  .addOnFailureListener(onFailureListener);
+                .detectInImage(this.lastVisionImage)
+                .addOnSuccessListener(onSuccessListener)
+                .addOnFailureListener(onFailureListener);
             } else {
               this.runDetector(data, previewSize.width, previewSize.height);
             }
@@ -252,13 +276,11 @@ export abstract class MLKitCameraView extends MLKitCameraViewBase {
   }
 
   private setMetadata(previewSize: SizeWH): void {
-    this.metadata =
-        new com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata.Builder()
-            .setFormat(com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata.IMAGE_FORMAT_NV21)
-            .setWidth(previewSize.width)
-            .setHeight(previewSize.height)
-            .setRotation(this.rotation)
-            .build();
+    this.metadata = {
+      format: com.google.mlkit.vision.common.InputImage.IMAGE_FORMAT_NV21,
+      width: previewSize.width,
+      height: previewSize.height
+    };
   }
 
   private fixStretch(previewSize: SizeWH): void {
@@ -319,7 +341,7 @@ export abstract class MLKitCameraView extends MLKitCameraViewBase {
 
   private createFailureListener(): any {
     return new (<any>com.google.android.gms).tasks.OnFailureListener({
-      onFailure: exception => console.log(exception.getMessage())
+      onFailure: exception => console.error(exception.printStackTrace())
     });
   }
 
@@ -339,7 +361,7 @@ export abstract class MLKitCameraView extends MLKitCameraViewBase {
         let pictureSize = supportedPictureSizes.get(j);
         let pictureAspectRatio = pictureSize.width / pictureSize.height;
         if (Math.abs(previewAspectRatio - pictureAspectRatio) < 0.01 /* ASPECT_RATIO_TOLERANCE */) {
-          validPreviewSizes.push({previewSize: previewSize, pictureSize: pictureSize});
+          validPreviewSizes.push({ previewSize: previewSize, pictureSize: pictureSize });
           break;
         }
       }
@@ -353,7 +375,7 @@ export abstract class MLKitCameraView extends MLKitCameraViewBase {
       for (let i = 0; i < supportedPreviewSizes.size(); i++) {
         let previewSize = supportedPreviewSizes.get(i);
         // The null picture size will let us know that we shouldn't set a picture size.
-        validPreviewSizes.push({previewSize: previewSize, pictureSize: null});
+        validPreviewSizes.push({ previewSize: previewSize, pictureSize: null });
       }
     }
 
@@ -433,6 +455,7 @@ export abstract class MLKitCameraView extends MLKitCameraViewBase {
 
     // This corresponds to the rotation constants.
     this.rotation = angle / 90;
+    this.rotationDegrees = displayAngle;
 
     camera.setDisplayOrientation(displayAngle);
     parameters.setRotation(angle);

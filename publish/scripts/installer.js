@@ -287,7 +287,7 @@ function echoAndroidManifestChanges(result) {
       console.log('\n######################################################################################################');
       console.log('Open your app\'s resources/Android/AndroidManifest.xml file and add this (see the demo for an example):');
       console.log('<meta-data\n' +
-          '    android:name="com.google.firebase.ml.vision.DEPENDENCIES"\n' +
+          '    android:name="com.google.mlkit.vision.DEPENDENCIES"\n' +
           '    android:value="' + selectedFeatures.join(',') + '" />');
       console.log('######################################################################################################\n');
     }
@@ -629,7 +629,7 @@ dependencies {
 
     // make sure you have these versions by updating your local Android SDK's (Android Support repo and Google repo)
 
-    ` + (isSelected(result.analytics) || (!isSelected(result.external_push_client_only) && !isPresent(result.analytics)) ? `` : `//`) + ` implementation "com.google.firebase:firebase-analytics:17.2.2"
+    ` + (isSelected(result.analytics) || (!isSelected(result.external_push_client_only) && !isPresent(result.analytics)) ? `` : `//`) + ` implementation "com.google.firebase:firebase-analytics:19.0.0"
 
     // for reading google-services.json and configuration
     implementation "com.google.android.gms:play-services-base:$googlePlayServicesVersion"
@@ -647,19 +647,19 @@ dependencies {
     ` + (isSelected(result.remote_config) ? `` : `//`) + ` implementation "com.google.firebase:firebase-config:19.1.1"
 
     // Performance Monitoring
-    ` + (isSelected(result.performance_monitoring) ? `` : `//`) + ` implementation "com.google.firebase:firebase-perf:19.0.5"
+    ` + (isSelected(result.performance_monitoring) ? `` : `//`) + ` implementation "com.google.firebase:firebase-perf:20.0.0"
 
     // Crashlytics
     ` + (isSelected(result.crashlytics) ? `` : `//`) + ` implementation "com.google.firebase:firebase-crashlytics:17.2.2"
 
     // Cloud Messaging (FCM)
-    ` + (isSelected(result.messaging) || isSelected(result.external_push_client_only) ? `` : `//`) + ` implementation "com.google.firebase:firebase-messaging:20.1.0"
+    ` + (isSelected(result.messaging) || isSelected(result.external_push_client_only) ? `` : `//`) + ` implementation "com.google.firebase:firebase-messaging:22.0.0"
     // ` + (isSelected(result.messaging) || isSelected(result.external_push_client_only) ? `` : `//`) + ` implementation "me.leolin:ShortcutBadger:1.1.22@aar"
 
     // In-App Messaging
     ` + (isSelected(result.in_app_messaging) ? `` : `//`) + ` implementation "com.google.firebase:firebase-inappmessaging-display:19.0.3"
     // Analytics seems to be required for In-App Messaging
-    ` + (isSelected(result.in_app_messaging) && !isSelected(result.analytics) ? `` : `//`) + ` implementation "com.google.firebase:firebase-analytics:17.2.2"
+    ` + (isSelected(result.in_app_messaging) && !isSelected(result.analytics) ? `` : `//`) + ` implementation "com.google.firebase:firebase-analytics:19.0.0"
 
     // Cloud Storage
     ` + (isSelected(result.storage) ? `` : `//`) + ` implementation "com.google.firebase:firebase-storage:19.1.1"
@@ -671,11 +671,14 @@ dependencies {
     ` + (isSelected(result.admob) ? `` : `//`) + ` implementation "com.google.firebase:firebase-ads:18.3.0"
 
     // ML Kit
-    ` + (isSelected(result.ml_kit) ? `` : `//`) + ` implementation "com.google.firebase:firebase-ml-vision:24.0.1"
-    ` + (isSelected(result.ml_kit_image_labeling) ? `` : `//`) + ` implementation "com.google.firebase:firebase-ml-vision-image-label-model:19.0.0"
-    ` + (isSelected(result.ml_kit_object_detection) ? `` : `//`) + ` implementation "com.google.firebase:firebase-ml-vision-object-detection-model:19.0.3"
+    ` + (isSelected(result.ml_kit) ? `` : `//`) + ` implementation "com.google.mlkit:vision-common:16.4.0"
+    ` + (isSelected(result.ml_kit_barcode_scanning) ? `` : `//`) + ` implementation "com.google.android.gms:play-services-mlkit-barcode-scanning:16.1.5"
+    ` + (isSelected(result.ml_kit_image_labeling) ? `` : `//`) + ` implementation com.google.android.gms:play-services-mlkit-image-labeling:16.0.4"
+    ` + (isSelected(result.ml_kit_face_detection) ? `` : `//`) + ` implementation "com.google.android.gms:play-services-mlkit-face-detection:16.1.7"
+    ` + (isSelected(result.ml_kit_text_recognition) ? `` : `//`) + ` implementation "com.google.android.gms:play-services-mlkit-text-recognition:16.2.0"
+    ` + (isSelected(result.ml_kit_object_detection) ? `` : `//`) + ` implementation "com.google.mlkit:object-detection:16.2.5"
     ` + (isSelected(result.ml_kit_custom_model) ? `` : `//`) + ` implementation "com.google.firebase:firebase-ml-model-interpreter:22.0.1"
-    ` + (isSelected(result.ml_kit_automl) ? `` : `//`) + ` implementation "com.google.firebase:firebase-ml-vision-automl:18.0.3"
+    ` + (isSelected(result.ml_kit_automl) ? `` : `//`) + ` implementation "com.google.mlkit:image-labeling-custom:16.3.1"
     ` + (isSelected(result.ml_kit_natural_language_identification) || isSelected(result.ml_kit_natural_language_smartreply) || isSelected(result.ml_kit_natural_language_translation) ? `` : `//`) + ` implementation "com.google.firebase:firebase-ml-natural-language:22.0.0"
     ` + (isSelected(result.ml_kit_natural_language_identification) ? `` : `//`) + ` implementation "com.google.firebase:firebase-ml-natural-language-language-id-model:20.0.7"
     ` + (isSelected(result.ml_kit_natural_language_translation) ? `` : `//`) + ` implementation "com.google.firebase:firebase-ml-natural-language-translate-model:20.0.7"

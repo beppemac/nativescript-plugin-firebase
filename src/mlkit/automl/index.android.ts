@@ -3,8 +3,6 @@ import { MLKitVisionOptions, } from "../";
 import { MLKitAutoMLOptions, MLKitAutoMLResult } from "./";
 import { MLKitAutoML as MLKitAutoMLBase } from "./automl-common";
 
-declare const com: any;
-
 export class MLKitAutoML extends MLKitAutoMLBase {
 
   protected createDetector(): any {
@@ -12,7 +10,7 @@ export class MLKitAutoML extends MLKitAutoMLBase {
   }
 
   protected createSuccessListener(): any {
-    return new com.google.android.gms.tasks.OnSuccessListener({
+    return new (<any>com.google.android.gms).tasks.OnSuccessListener({
       onSuccess: labels => {
 
         if (labels.size() === 0) return;
@@ -27,7 +25,7 @@ export class MLKitAutoML extends MLKitAutoMLBase {
 
         // see https://github.com/firebase/quickstart-android/blob/0f4c86877fc5f771cac95797dffa8bd026dd9dc7/mlkit/app/src/main/java/com/google/firebase/samples/apps/mlkit/textrecognition/TextRecognitionProcessor.java#L62
         for (let i = 0; i < labels.size(); i++) {
-          const label: com.google.firebase.ml.vision.label.FirebaseVisionImageLabel = labels.get(i);
+          const label: com.google.mlkit.vision.label.ImageLabel = labels.get(i);
           result.labels.push({
             text: label.getText(),
             confidence: label.getConfidence()
@@ -44,20 +42,19 @@ export class MLKitAutoML extends MLKitAutoMLBase {
   }
 }
 
-function getDetector(localModelResourceFolder: string, confidenceThreshold: number): com.google.firebase.ml.vision.label.FirebaseVisionImageLabeler {
+function getDetector(localModelResourceFolder: string, confidenceThreshold: number): com.google.mlkit.vision.label.ImageLabeler {
   // TODO also support cloud hosted models
-  const model = new com.google.firebase.ml.vision.automl.FirebaseAutoMLLocalModel.Builder()
-      .setAssetFilePath(localModelResourceFolder + "/manifest.json") // we can use this..
+  const model = new com.google.mlkit.common.model.LocalModel.Builder()
+      .setAssetManifestFilePath(localModelResourceFolder + "/manifest.json") // we can use this..
       // .setFilePath() // .. or this
       .build();
 
   const labelDetectorOptions =
-      new com.google.firebase.ml.vision.label.FirebaseVisionOnDeviceAutoMLImageLabelerOptions.Builder(model)
+      new com.google.mlkit.vision.label.custom.CustomImageLabelerOptions.Builder(model)
           .setConfidenceThreshold(confidenceThreshold)
           .build();
 
-  return com.google.firebase.ml.vision.FirebaseVision.getInstance()
-      .getOnDeviceAutoMLImageLabeler(labelDetectorOptions);
+  return com.google.mlkit.vision.label.ImageLabeling.getClient(labelDetectorOptions);
 }
 
 export function labelImage(options: MLKitAutoMLOptions): Promise<MLKitAutoMLResult> {
@@ -65,7 +62,7 @@ export function labelImage(options: MLKitAutoMLOptions): Promise<MLKitAutoMLResu
     try {
       const firebaseVisionAutoMLImageLabeler = getDetector(options.localModelResourceFolder, options.confidenceThreshold || 0.5);
 
-      const onSuccessListener = new com.google.android.gms.tasks.OnSuccessListener({
+      const onSuccessListener = new (<any>com.google.android.gms).tasks.OnSuccessListener({
         onSuccess: labels => {
           const result = <MLKitAutoMLResult>{
             labels: []
@@ -73,7 +70,7 @@ export function labelImage(options: MLKitAutoMLOptions): Promise<MLKitAutoMLResu
 
           if (labels) {
             for (let i = 0; i < labels.size(); i++) {
-              const label: com.google.firebase.ml.vision.label.FirebaseVisionImageLabel = labels.get(i);
+              const label: com.google.mlkit.vision.label.ImageLabel = labels.get(i);
               result.labels.push({
                 text: label.getText(),
                 confidence: label.getConfidence()
@@ -86,12 +83,12 @@ export function labelImage(options: MLKitAutoMLOptions): Promise<MLKitAutoMLResu
         }
       });
 
-      const onFailureListener = new com.google.android.gms.tasks.OnFailureListener({
+      const onFailureListener = new (<any>com.google.android.gms).tasks.OnFailureListener({
         onFailure: exception => reject(exception.getMessage())
       });
 
       firebaseVisionAutoMLImageLabeler
-          .processImage(getImage(options))
+          .process(getImage(options))
           .addOnSuccessListener(onSuccessListener)
           .addOnFailureListener(onFailureListener);
 
@@ -104,5 +101,5 @@ export function labelImage(options: MLKitAutoMLOptions): Promise<MLKitAutoMLResu
 
 function getImage(options: MLKitVisionOptions): any /* com.google.firebase.ml.vision.common.FirebaseVisionImage */ {
   const image: android.graphics.Bitmap = options.image instanceof ImageSource ? options.image.android : options.image.imageSource.android;
-  return com.google.firebase.ml.vision.common.FirebaseVisionImage.fromBitmap(image);
+  return com.google.mlkit.vision.common.InputImage.fromBitmap(image, 0);
 }

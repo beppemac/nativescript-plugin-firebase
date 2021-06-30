@@ -120,15 +120,15 @@ function boundingBoxToBounds(rect: any): MLKitScanBarcodesResultBounds {
   };
 }
 
-function getBarcodeDetector(formats?: Array<BarcodeFormat>): any {
+function getBarcodeDetector(formats?: Array<BarcodeFormat>): com.google.mlkit.vision.barcode.BarcodeScanner {
   if (formats && formats.length > 0) {
     const firebaseVisionBarcodeDetectorOptions =
-        new com.google.firebase.ml.vision.barcode.FirebaseVisionBarcodeDetectorOptions.Builder()
+        new com.google.mlkit.vision.barcode.BarcodeScannerOptions.Builder()
             .setBarcodeFormats(formats[0], formats) // the seconds argument is a varargs.. let's make it easy and just do it like this
             .build();
-    return com.google.firebase.ml.vision.FirebaseVision.getInstance().getVisionBarcodeDetector(firebaseVisionBarcodeDetectorOptions);
+    return com.google.mlkit.vision.barcode.BarcodeScanning.getClient(firebaseVisionBarcodeDetectorOptions);
   } else {
-    return com.google.firebase.ml.vision.FirebaseVision.getInstance().getVisionBarcodeDetector();
+    return com.google.mlkit.vision.barcode.BarcodeScanning.getClient();
   }
 }
 
@@ -138,7 +138,7 @@ export function scanBarcodesOnDevice(options: MLKitScanBarcodesOnDeviceOptions):
       const firebaseVisionBarcodeDetector = getBarcodeDetector(options.formats);
 
       const image: android.graphics.Bitmap = options.image instanceof ImageSource ? options.image.android : options.image.imageSource.android;
-      const firImage = com.google.firebase.ml.vision.common.FirebaseVisionImage.fromBitmap(image);
+      const firImage = com.google.mlkit.vision.common.InputImage.fromBitmap(image, 0);
 
       const onSuccessListener = new (<any>com.google.android.gms).tasks.OnSuccessListener({
         onSuccess: barcodes => {
@@ -174,7 +174,7 @@ export function scanBarcodesOnDevice(options: MLKitScanBarcodesOnDeviceOptions):
       });
 
       firebaseVisionBarcodeDetector
-          .detectInImage(firImage)
+          .process(firImage)
           .addOnSuccessListener(onSuccessListener)
           .addOnFailureListener(onFailureListener);
 

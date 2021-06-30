@@ -52,7 +52,7 @@ after your app is installed from the Play Store. Add this to your `<resources>/A
 
 ```xml
 <meta-data
-    android:name="com.google.firebase.ml.vision.DEPENDENCIES"
+    android:name="com.google.mlkit.vision.DEPENDENCIES"
     android:value="ocr,face,.." />
 ```
 

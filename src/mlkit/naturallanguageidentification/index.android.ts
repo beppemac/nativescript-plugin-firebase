@@ -4,6 +4,8 @@ import {
   MLKitNaturalLanguageIdentificationResult
 } from "./index";
 
+declare const com: any;
+
 export function identifyNaturalLanguage(options: MLKitNaturalLanguageIdentificationOptions): Promise<MLKitNaturalLanguageIdentificationResult> {
   return new Promise((resolve, reject) => {
     try {

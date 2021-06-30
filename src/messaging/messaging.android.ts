@@ -3,7 +3,7 @@ import { Application } from "@nativescript/core";
 import { PushNotificationModel } from "./messaging.ios";
 import { firebase as fbNamespace } from "../firebase";
 
-declare const android, com, global: any;
+declare const android, global: any;
 const NotificationManagerCompatClass = useAndroidX() ? global.androidx.core.app.NotificationManagerCompat : android.support.v4.app.NotificationManagerCompat;
 
 let _launchNotification = null;
@@ -224,7 +224,7 @@ export function subscribeToTopic(topicName) {
         return;
       }
 
-      const onCompleteListener = new com.google.android.gms.tasks.OnCompleteListener({
+      const onCompleteListener = new (<any>com.google.android.gms).tasks.OnCompleteListener({
         onComplete: task => task.isSuccessful() ? resolve() : reject(task.getException() && task.getException().getReason ? task.getException().getReason() : task.getException())
       });
 
@@ -247,7 +247,7 @@ export function unsubscribeFromTopic(topicName) {
         return;
       }
 
-      const onCompleteListener = new com.google.android.gms.tasks.OnCompleteListener({
+      const onCompleteListener = new (<any>com.google.android.gms).tasks.OnCompleteListener({
         onComplete: task => task.isSuccessful() ? resolve() : reject(task.getException() && task.getException().getReason ? task.getException().getReason() : task.getException())
       });
 

@@ -86,24 +86,11 @@ declare module org {
 	export module nativescript {
 		export module plugins {
 			export module firebase {
-				export class MyFirebaseInstanceIDService {
-					public static class: java.lang.Class<org.nativescript.plugins.firebase.MyFirebaseInstanceIDService>;
-					public onTokenRefresh(): void;
-					public constructor();
-				}
-			}
-		}
-	}
-}
-
-declare module org {
-	export module nativescript {
-		export module plugins {
-			export module firebase {
 				export class MyFirebaseMessagingService {
 					public static class: java.lang.Class<org.nativescript.plugins.firebase.MyFirebaseMessagingService>;
 					public constructor();
 					public onMessageReceived(param0: com.google.firebase.messaging.RemoteMessage): void;
+					public onNewToken(param0: string): void;
 				}
 			}
 		}

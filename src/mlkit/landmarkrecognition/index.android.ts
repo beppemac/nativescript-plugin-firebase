@@ -20,7 +20,7 @@ export function recognizeLandmarksCloud(options: MLKitLandmarkRecognitionCloudOp
     try {
       const firebaseVisionLandmarkDetector = getDetector(options.modelType, options.maxResults);
 
-      const onSuccessListener = new com.google.android.gms.tasks.OnSuccessListener({
+      const onSuccessListener = new (<any>com.google.android.gms).tasks.OnSuccessListener({
         onSuccess: landmarks => {
           const result = <MLKitLandmarkRecognitionCloudResult>{
             landmarks: []
@@ -41,7 +41,7 @@ export function recognizeLandmarksCloud(options: MLKitLandmarkRecognitionCloudOp
         }
       });
 
-      const onFailureListener = new com.google.android.gms.tasks.OnFailureListener({
+      const onFailureListener = new (<any>com.google.android.gms).tasks.OnFailureListener({
         onFailure: exception => reject(exception.getMessage())
       });
 
@@ -59,5 +59,5 @@ export function recognizeLandmarksCloud(options: MLKitLandmarkRecognitionCloudOp
 
 function getImage(options: MLKitVisionOptions): any /* com.google.firebase.ml.vision.common.FirebaseVisionImage */ {
   const image: android.graphics.Bitmap = options.image instanceof ImageSource ? options.image.android : options.image.imageSource.android;
-  return com.google.firebase.ml.vision.common.FirebaseVisionImage.fromBitmap(image);
+  return com.google.mlkit.vision.common.InputImage.fromBitmap(image, 0);
 }

@@ -44,6 +44,12 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
   }
 
+  @Override
+  public void onNewToken(String refreshedToken) {
+    // Send to client
+    FirebasePlugin.executeOnPushTokenReceivedCallback(refreshedToken);
+  }
+
 
   /*
   private void sendNotification(String messageBody) {

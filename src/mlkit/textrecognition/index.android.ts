@@ -9,16 +9,15 @@ import {
   MLKitRecognizeTextResultLine
 } from "./index";
 
-declare const com: any;
 
 export class MLKitTextRecognition extends MLKitTextRecognitionBase {
 
-  protected createDetector(): any /* FirebaseVisionTextRecognizer */ {
-    return com.google.firebase.ml.vision.FirebaseVision.getInstance().getOnDeviceTextRecognizer();
+  protected createDetector(): com.google.mlkit.vision.text.TextRecognizer /* FirebaseVisionTextRecognizer */ {
+    return com.google.mlkit.vision.text.TextRecognition.getClient(com.google.mlkit.vision.text.TextRecognizerOptions.DEFAULT_OPTIONS);
   }
 
   protected createSuccessListener(): any {
-    return new com.google.android.gms.tasks.OnSuccessListener({
+    return new (<any>com.google.android.gms).tasks.OnSuccessListener({
       onSuccess: firebaseVisionText => {
         if (firebaseVisionText.getTextBlocks().size() > 0) {
           this.notify({
@@ -103,21 +102,21 @@ function getResult(firebaseVisionText: any): MLKitRecognizeTextResult {
 export function recognizeTextOnDevice(options: MLKitRecognizeTextOnDeviceOptions): Promise<MLKitRecognizeTextResult> {
   return new Promise((resolve, reject) => {
     try {
-      const firebaseVisionTextRecognizer = com.google.firebase.ml.vision.FirebaseVision.getInstance().getOnDeviceTextRecognizer();
+      const firebaseVisionTextRecognizer = com.google.mlkit.vision.text.TextRecognition.getClient(com.google.mlkit.vision.text.TextRecognizerOptions.DEFAULT_OPTIONS);
 
-      const onSuccessListener = new com.google.android.gms.tasks.OnSuccessListener({
+      const onSuccessListener = new (<any>com.google.android.gms).tasks.OnSuccessListener({
         onSuccess: firebaseVisionText => {
           resolve(getResult(firebaseVisionText));
           firebaseVisionTextRecognizer.close();
         }
       });
 
-      const onFailureListener = new com.google.android.gms.tasks.OnFailureListener({
+      const onFailureListener = new (<any>com.google.android.gms).tasks.OnFailureListener({
         onFailure: exception => reject(exception.getMessage())
       });
 
       firebaseVisionTextRecognizer
-          .processImage(getImage(options))
+          .process(getImage(options))
           .addOnSuccessListener(onSuccessListener)
           .addOnFailureListener(onFailureListener);
 
@@ -138,21 +137,21 @@ export function recognizeTextCloud(options: MLKitRecognizeTextCloudOptions): Pro
           // .setMaxResults(options.maxResults || 10)
           //     .build();
 
-      const firebaseVisionCloudTextRecognizer = com.google.firebase.ml.vision.FirebaseVision.getInstance().getCloudTextRecognizer();
+      const firebaseVisionCloudTextRecognizer = com.google.mlkit.vision.text.TextRecognition.getClient(com.google.mlkit.vision.text.TextRecognizerOptions.DEFAULT_OPTIONS);
 
-      const onSuccessListener = new com.google.android.gms.tasks.OnSuccessListener({
+      const onSuccessListener = new (<any>com.google.android.gms).tasks.OnSuccessListener({
         onSuccess: firebaseVisionText => {
           resolve(getResult(firebaseVisionText));
           firebaseVisionCloudTextRecognizer.close();
         }
       });
 
-      const onFailureListener = new com.google.android.gms.tasks.OnFailureListener({
+      const onFailureListener = new (<any>com.google.android.gms).tasks.OnFailureListener({
         onFailure: exception => reject(exception.getMessage())
       });
 
       firebaseVisionCloudTextRecognizer
-          .processImage(getImage(options))
+          .process(getImage(options))
           .addOnSuccessListener(onSuccessListener)
           .addOnFailureListener(onFailureListener);
 
@@ -165,5 +164,5 @@ export function recognizeTextCloud(options: MLKitRecognizeTextCloudOptions): Pro
 
 function getImage(options: MLKitVisionOptions): any /* com.google.firebase.ml.vision.common.FirebaseVisionImage */ {
   const image: android.graphics.Bitmap = options.image instanceof ImageSource ? options.image.android : options.image.imageSource.android;
-  return com.google.firebase.ml.vision.common.FirebaseVisionImage.fromBitmap(image);
+  return com.google.mlkit.vision.common.InputImage.fromBitmap(image, 0);
 }

@@ -3,8 +3,6 @@ import { MLKitVisionOptions, } from "../";
 import { MLKitImageLabelingOptions, MLKitImageLabelingCloudResult, MLKitImageLabelingOnDeviceResult } from "./";
 import { MLKitImageLabeling as MLKitImageLabelingBase } from "./imagelabeling-common";
 
-declare const com: any;
-
 export class MLKitImageLabeling extends MLKitImageLabelingBase {
 
   protected createDetector(): any {
@@ -12,7 +10,7 @@ export class MLKitImageLabeling extends MLKitImageLabelingBase {
   }
 
   protected createSuccessListener(): any {
-    return new com.google.android.gms.tasks.OnSuccessListener({
+    return new (<any>com.google.android.gms).tasks.OnSuccessListener({
       onSuccess: labels => {
 
         if (labels.size() === 0) return;
@@ -27,7 +25,7 @@ export class MLKitImageLabeling extends MLKitImageLabelingBase {
 
         // see https://github.com/firebase/quickstart-android/blob/0f4c86877fc5f771cac95797dffa8bd026dd9dc7/mlkit/app/src/main/java/com/google/firebase/samples/apps/mlkit/textrecognition/TextRecognitionProcessor.java#L62
         for (let i = 0; i < labels.size(); i++) {
-          const label: com.google.firebase.ml.vision.label.FirebaseVisionImageLabel = labels.get(i);
+          const label: com.google.mlkit.vision.label.ImageLabel = labels.get(i);
           result.labels.push({
             text: label.getText(),
             confidence: label.getConfidence()
@@ -44,13 +42,13 @@ export class MLKitImageLabeling extends MLKitImageLabelingBase {
   }
 }
 
-function getDetector(confidenceThreshold: number): com.google.firebase.ml.vision.label.FirebaseVisionImageLabeler {
+function getDetector(confidenceThreshold: number): com.google.mlkit.vision.label.ImageLabeler {
   const labelDetectorOptions =
-      new com.google.firebase.ml.vision.label.FirebaseVisionOnDeviceImageLabelerOptions.Builder()
+      new com.google.mlkit.vision.label.defaults.ImageLabelerOptions.Builder()
           .setConfidenceThreshold(confidenceThreshold)
           .build();
 
-  return com.google.firebase.ml.vision.FirebaseVision.getInstance().getOnDeviceImageLabeler(labelDetectorOptions);
+  return com.google.mlkit.vision.label.ImageLabeling.getClient(labelDetectorOptions);
 }
 
 export function labelImageOnDevice(options: MLKitImageLabelingOptions): Promise<MLKitImageLabelingOnDeviceResult> {
@@ -58,7 +56,7 @@ export function labelImageOnDevice(options: MLKitImageLabelingOptions): Promise<
     try {
       const firebaseVisionLabelDetector = getDetector(options.confidenceThreshold || 0.5);
 
-      const onSuccessListener = new com.google.android.gms.tasks.OnSuccessListener({
+      const onSuccessListener = new (<any>com.google.android.gms).tasks.OnSuccessListener({
         onSuccess: labels => {
           const result = <MLKitImageLabelingOnDeviceResult>{
             labels: []
@@ -66,7 +64,7 @@ export function labelImageOnDevice(options: MLKitImageLabelingOptions): Promise<
 
           if (labels) {
             for (let i = 0; i < labels.size(); i++) {
-              const label: com.google.firebase.ml.vision.label.FirebaseVisionImageLabel = labels.get(i);
+              const label: com.google.mlkit.vision.label.ImageLabel = labels.get(i);
               result.labels.push({
                 text: label.getText(),
                 confidence: label.getConfidence()
@@ -79,12 +77,12 @@ export function labelImageOnDevice(options: MLKitImageLabelingOptions): Promise<
         }
       });
 
-      const onFailureListener = new com.google.android.gms.tasks.OnFailureListener({
+      const onFailureListener = new (<any>com.google.android.gms).tasks.OnFailureListener({
         onFailure: exception => reject(exception.getMessage())
       });
 
       firebaseVisionLabelDetector
-          .processImage(getImage(options))
+          .process(getImage(options))
           .addOnSuccessListener(onSuccessListener)
           .addOnFailureListener(onFailureListener);
 
@@ -97,7 +95,10 @@ export function labelImageOnDevice(options: MLKitImageLabelingOptions): Promise<
 
 export function labelImageCloud(options: MLKitImageLabelingOptions): Promise<MLKitImageLabelingCloudResult> {
   return new Promise((resolve, reject) => {
-    try {
+    // TODO 
+    reject("NOT IMPLEMENTED YET");
+    /* try {
+      
       const cloudDetectorOptions =
           new com.google.firebase.ml.vision.label.FirebaseVisionCloudImageLabelerOptions.Builder()
               .setConfidenceThreshold(options.confidenceThreshold || 0.5)
@@ -105,7 +106,7 @@ export function labelImageCloud(options: MLKitImageLabelingOptions): Promise<MLK
 
       const firebaseVisionCloudLabelDetector = com.google.firebase.ml.vision.FirebaseVision.getInstance().getCloudImageLabeler(cloudDetectorOptions);
 
-      const onSuccessListener = new com.google.android.gms.tasks.OnSuccessListener({
+      const onSuccessListener = new (<any>com.google.android.gms).tasks.OnSuccessListener({
         onSuccess: labels => {
           const result = <MLKitImageLabelingCloudResult>{
             labels: []
@@ -113,7 +114,7 @@ export function labelImageCloud(options: MLKitImageLabelingOptions): Promise<MLK
 
           if (labels) {
             for (let i = 0; i < labels.size(); i++) {
-              const label: com.google.firebase.ml.vision.label.FirebaseVisionImageLabel = labels.get(i);
+              const label: com.google.mlkit.vision.label.ImageLabel = labels.get(i);
               result.labels.push({
                 text: label.getText(),
                 confidence: label.getConfidence()
@@ -126,7 +127,7 @@ export function labelImageCloud(options: MLKitImageLabelingOptions): Promise<MLK
         }
       });
 
-      const onFailureListener = new com.google.android.gms.tasks.OnFailureListener({
+      const onFailureListener = new (<any>com.google.android.gms).tasks.OnFailureListener({
         onFailure: exception => reject(exception.getMessage())
       });
 
@@ -138,11 +139,11 @@ export function labelImageCloud(options: MLKitImageLabelingOptions): Promise<MLK
     } catch (ex) {
       console.log("Error in firebase.mlkit.labelImageCloud: " + ex);
       reject(ex);
-    }
+    }*/
   });
 }
 
 function getImage(options: MLKitVisionOptions): any /* com.google.firebase.ml.vision.common.FirebaseVisionImage */ {
   const image: android.graphics.Bitmap = options.image instanceof ImageSource ? options.image.android : options.image.imageSource.android;
-  return com.google.firebase.ml.vision.common.FirebaseVisionImage.fromBitmap(image);
+  return com.google.mlkit.vision.common.InputImage.fromBitmap(image, 0);
 }

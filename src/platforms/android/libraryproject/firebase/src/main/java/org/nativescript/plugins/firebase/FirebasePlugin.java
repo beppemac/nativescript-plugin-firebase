@@ -2,9 +2,13 @@ package org.nativescript.plugins.firebase;
 
 import android.util.Log;
 
-import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.io.IOException;
+
+import androidx.annotation.NonNull;
 
 public class FirebasePlugin {
   private static final String TAG = "FirebasePlugin";
@@ -19,17 +23,25 @@ public class FirebasePlugin {
   public static void registerForPushNotifications(final String senderId) {
     new Thread() {
       public void run() {
-        try {
-          String token = FirebaseInstanceId.getInstance().getToken(senderId, "FCM");
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                  @Override
+                  public void onComplete(@NonNull Task<String> task) {
+                    if (!task.isSuccessful()) {
+                      Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                      return;
+                    }
 
-          if (!preventInitialRegisterTokenCallback) {
-            executeOnPushTokenReceivedCallback(token);
-          }
+                    // Get new FCM registration token
+                    String token = task.getResult();
 
-          preventInitialRegisterTokenCallback = false;
-        } catch (IOException e) {
-          Log.e(TAG, "Error getting a token from FCM: " + e.getMessage(), e);
-        }
+                    if (!preventInitialRegisterTokenCallback) {
+                      executeOnPushTokenReceivedCallback(token);
+                    }
+
+                    preventInitialRegisterTokenCallback = false;
+                  }
+                });
       }
     }.start();
   }
@@ -37,12 +49,22 @@ public class FirebasePlugin {
   public static void getCurrentPushToken(final String senderId, final FirebasePluginListener callback) {
     new Thread() {
       public void run() {
-        try {
-          callback.success(FirebaseInstanceId.getInstance().getToken(senderId, "FCM"));
-        } catch (IOException e) {
-          Log.e(TAG, "Error getting a token from FCM: " + e.getMessage(), e);
-          callback.error(e.getMessage());
-        }
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                  @Override
+                  public void onComplete(@NonNull Task<String> task) {
+                    if (!task.isSuccessful()) {
+                      Log.e(TAG, "Error getting a token from FCM: " + task.getException());
+                      callback.error(task.getException());
+                      return;
+                    }
+
+                    // Get new FCM registration token
+                    String token = task.getResult();
+
+                    callback.success(token);
+                  }
+                });
       }
     }.start();
   }
@@ -50,18 +72,18 @@ public class FirebasePlugin {
   public static void unregisterForPushNotifications(final String senderId) {
     new Thread() {
       public void run() {
-        try {
-          // No matter the workflow, on unregister we must ensure that subsequent calls to register
-          // will trigger any callbacks.
+
           preventInitialRegisterTokenCallback = false;
 
-          FirebaseInstanceId.getInstance().deleteToken(senderId, "FCM");
-          // Do not use deleteInstanceId because by default FCM automatically re-initializes
-          // the token and we get onPushTokenReceivedCallback triggered.
-//          FirebaseInstanceId.getInstance().deleteInstanceId();
-        } catch (IOException e) {
-          Log.e(TAG, "Error deleting token in FCM: " + e.getMessage(), e);
-        }
+          FirebaseMessaging.getInstance().deleteToken().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+              if (!task.isSuccessful()) {
+                Log.e(TAG, "Error deleting a token from FCM: " + task.getException());
+              }
+              return;
+            }
+          });
       }
     }.start();
   }

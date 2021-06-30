@@ -13,11 +13,11 @@ export function ensureTranslationModelDownloaded(options: MLKitTranslationModelD
 export function translateText(options: MLKitTranslationOptions): Promise<string> {
   return new Promise<string>((resolve, reject) => {
     try {
-      const onSuccessListener = new com.google.android.gms.tasks.OnSuccessListener({
+      const onSuccessListener = new (<any>com.google.android.gms).tasks.OnSuccessListener({
         onSuccess: (result: string) => resolve(result)
       });
 
-      const onFailureListener = new com.google.android.gms.tasks.OnFailureListener({
+      const onFailureListener = new (<any>com.google.android.gms).tasks.OnFailureListener({
         onFailure: exception => reject(exception.getMessage())
       });
 
@@ -52,11 +52,11 @@ function _downloadTranslationModelIfNeeded(options: MLKitTranslationModelDownloa
           .requireWifi()
           .build();
 
-      const onSuccessListener = new com.google.android.gms.tasks.OnSuccessListener({
+      const onSuccessListener = new (<any>com.google.android.gms).tasks.OnSuccessListener({
         onSuccess: () => resolve(firTranslator)
       });
 
-      const onFailureListener = new com.google.android.gms.tasks.OnFailureListener({
+      const onFailureListener = new (<any>com.google.android.gms).tasks.OnFailureListener({
         onFailure: exception => reject(exception.getMessage())
       });
 

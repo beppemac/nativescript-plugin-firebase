@@ -130,17 +130,18 @@
   "homepage": "https://github.com/eddyverbruggen/nativescript-plugin-firebase",
   "readmeFilename": "README.md",
   "dependencies": {
-    "fs-extra": "~9.0.1",
     "@nativescript/hook": "~2.0.0",
     "@nativescript/shared-notification-delegate": "~1.0.0",
+    "fs-extra": "~9.0.1",
     "prompt-lite": "~0.1.1",
-    "xcode": "~0.9.3",
-    "semver": "~7.3.2"
+    "semver": "~7.3.2",
+    "ts-node": "^10.0.0",
+    "xcode": "~0.9.3"
   },
   "devDependencies": {
     "rimraf": "~3.0.2",
-    "@nativescript/core": "~7.0.13",
-    "@nativescript/types": "~7.0.4",
+    "@nativescript/core": "~8.0.8",
+    "@nativescript/types": "~8.0.1",
     "@nativescript/webpack": "~3.0.8",
     "tslint": "~6.1.3",
     "typescript": "~4.0.5",

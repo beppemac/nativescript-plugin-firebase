@@ -35,7 +35,7 @@
 					android:value="@string/facebook_app_id"/>
 
 		<meta-data
-				android:name="com.google.firebase.ml.vision.DEPENDENCIES"
+				android:name="com.google.mlkit.vision.DEPENDENCIES"
 				android:value="ocr,barcode,face,label" />
 
 		<activity
